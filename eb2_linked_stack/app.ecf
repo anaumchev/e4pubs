@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-11-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-11-0 http://www.eiffel.com/developers/xml/configuration-1-11-0.xsd" name="app" uuid="EB2EB2EB-EBEB-EBEB-EBEB-EB2EB2EB2EB2">
+	<target name="app">
+		<root all_classes="true"/>
+		<option warning="false" full_class_checking="false" is_attached_by_default="false" void_safety="none" syntax="transitional">
+			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
+		</option>
+		<setting name="console_application" value="true"/>
+		<library name="base-eve" location="$ISE_LIBRARY\library\base\base-eve.ecf" readonly="false"/>
+		<cluster name="app" location="..\" recursive="false"/>
+		<override name="override" location=".\" recursive="false"/>
+	</target>
+</system>
