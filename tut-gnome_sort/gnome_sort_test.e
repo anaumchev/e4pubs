@@ -19,7 +19,7 @@ feature
 			s.gnome_sort (a)
 
 			check a.sequence.count = input.count end
-			check across 1 |..| a.count as i all i.item < a.count implies a[i.item] <= a[i.item+1] end end
+			check across 1 |..| a.count as i all i < a.count implies a[i] <= a[i+1] end end
 			check a.sequence.to_bag = input.to_bag end
 		end
 

@@ -9,10 +9,10 @@ feature
 		require
 			can_execute: cmd.light.is_wrapped
 
-			modify (Current, cmd.light)
 		do
 			cmd.execute
 		ensure
+			modify (Current, cmd.light)
 			(agent cmd.execute).postcondition ([])
 		end
 

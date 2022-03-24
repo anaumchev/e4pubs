@@ -15,7 +15,6 @@ feature -- Basic operations
 			a_not_empty: a.count > 0
 			no_overflow: a.count < {INTEGER}.max_value
 
-			modify (a)
 		local
 			i, j: INTEGER
 		do
@@ -41,7 +40,7 @@ feature -- Basic operations
 					is_part_sorted (a.sequence, j, i)
 					across 1 |..| (j-1) as k all
 						across (j+1) |..| i as l all
-							a.sequence[k.item] <= a.sequence[l.item] end end
+							a.sequence[k] <= a.sequence[l] end end
 				until
 					j = 1 or else a[j-1] <= a[j]
 				loop
@@ -53,6 +52,7 @@ feature -- Basic operations
 				i := i + 1
 			end
 		ensure
+			modify (a)
 			sorted: is_sorted (a.sequence)
 			permutation: is_permutation (a.sequence, old a.sequence)
 		end
@@ -67,7 +67,6 @@ feature -- Helper
 			i_in_range: 1 <= i and i <= a.count
 			j_in_range: 1 <= j and j <= a.count
 
-			modify (a)
 		local
 			t: INTEGER
 		do
@@ -75,6 +74,7 @@ feature -- Helper
 			a[i] := a[j]
 			a[j] := t
 		ensure
+			modify (a)
 			swapped: a.sequence ~ (old a.sequence).replaced_at (i, (old a.sequence[j])).replaced_at (j, (old a.sequence[i]))
 			is_permutation: a.sequence.to_bag ~ old a.sequence.to_bag
 		end
@@ -99,7 +99,7 @@ feature -- Specification
 		do
 			Result := across lower |..| (upper) as i all
 						across lower |..| (upper) as j all
-							i.item <= j.item implies s[i.item] <= s[j.item] end end
+							i <= j implies s[i] <= s[j] end end
 		end
 
 	is_permutation (s1, s2: MML_SEQUENCE [INTEGER]): BOOLEAN

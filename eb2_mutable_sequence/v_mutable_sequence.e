@@ -36,10 +36,10 @@ feature -- Replacement
 			-- Replace value at position `i' with `v'.
 		require
 			has_index: has_index (i)
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence ~ old sequence.replaced_at (idx (i), v)
 		end
 
@@ -50,8 +50,7 @@ feature -- Replacement
 		require
 			has_index_one: has_index (i1)
 			has_index_two: has_index (i2)
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		local
 			v: G
 		do
@@ -59,6 +58,7 @@ feature -- Replacement
 			put (item (i2), i1)
 			put (v, i2)
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence ~ old sequence.replaced_at (idx(i1), sequence [idx(i2)]).replaced_at (idx(i2), sequence [idx(i1)])
 		end
 
@@ -70,8 +70,7 @@ feature -- Replacement
 			l_not_too_small: l >= lower_
 			u_not_too_large: u <= upper_
 			l_not_too_large: l <= u + 1
-			observers_open: across observers as o all o.item.is_open end
-			modify_model (["sequence", "observers"], Current)
+			observers_open: across observers as o all o.is_open end
 		local
 			it: V_MUTABLE_SEQUENCE_ITERATOR [G]
 			j: INTEGER
@@ -85,7 +84,7 @@ feature -- Replacement
 				it.index_ = idx(j)
 				l <= j and j <= u + 1
 				upper_ = upper_.old_
-				across 1 |..| sequence.count as i all sequence [i.item] = if idx(l) <= i.item and i.item < idx(j) then v else sequence.old_ [i.item] end end
+				across 1 |..| sequence.count as i all sequence [i] = if idx(l) <= i and i < idx(j) then v else sequence.old_ [i] end end
 				modify_model (["index_", "sequence"], it)
 				modify_model ("sequence", Current)
 			until
@@ -98,10 +97,11 @@ feature -- Replacement
 
 			forget_iterator (it)
 		ensure
+			modify_model (["sequence", "observers"], Current)
 			sequence_domain_effect: sequence.count = old sequence.count
-			sequence_changed_effect: across idx (l) |..| idx (u) as i all sequence [i.item] = v end
-			sequence_front_unchanged: across 1 |..| idx (l - 1) as i all sequence [i.item] = (old sequence) [i.item] end
-			sequence_tail_unchanged: across idx (u + 1) |..| sequence.count as i all sequence [i.item] = (old sequence) [i.item] end
+			sequence_changed_effect: across idx (l) |..| idx (u) as i all sequence [i] = v end
+			sequence_front_unchanged: across 1 |..| idx (l - 1) as i all sequence [i] = (old sequence) [i] end
+			sequence_tail_unchanged: across idx (u + 1) |..| sequence.count as i all sequence [i] = (old sequence) [i] end
 			observers_restored: observers ~ old observers
 		end
 
@@ -113,15 +113,15 @@ feature -- Replacement
 			l_not_too_small: l >= lower_
 			u_not_too_large: u <= upper_
 			l_not_too_large: l <= u + 1
-			observers_open: across observers as o all o.item.is_open end
-			modify_model (["sequence", "observers"], Current)
+			observers_open: across observers as o all o.is_open end
 		do
 			fill (({G}).default, l, u)
 		ensure
+			modify_model (["sequence", "observers"], Current)
 			sequence_domain_effect: sequence.count = old sequence.count
-			sequence_changed_effect: across idx (l) |..| idx (u) as i all sequence [i.item] = ({G}).default end
-			sequence_front_unchanged: across 1 |..| idx (l - 1) as i all sequence [i.item] = (old sequence) [i.item] end
-			sequence_tail_unchanged: across idx (u + 1) |..| sequence.count as i all sequence [i.item] = (old sequence) [i.item] end
+			sequence_changed_effect: across idx (l) |..| idx (u) as i all sequence [i] = ({G}).default end
+			sequence_front_unchanged: across 1 |..| idx (l - 1) as i all sequence [i] = (old sequence) [i] end
+			sequence_tail_unchanged: across idx (u + 1) |..| sequence.count as i all sequence [i] = (old sequence) [i] end
 			observers_restored: observers ~ old observers
 		end
 
@@ -136,9 +136,7 @@ feature -- Replacement
 			other_first_not_too_large: other_first <= other_last + 1
 			index_not_too_small: index >= lower_
 			enough_space: upper_ - index >= other_last - other_first
-			observers_open: across observers as o all o.item.is_open end
-			modify_model (["sequence", "observers"], Current)
-			modify_model ("observers", other)
+			observers_open: across observers as o all o.is_open end
 		local
 			other_it: V_SEQUENCE_ITERATOR [G]
 			it: V_MUTABLE_SEQUENCE_ITERATOR [G]
@@ -157,10 +155,10 @@ feature -- Replacement
 				other_it.index_ = other.idx (other_first + j)
 				0 <= j and j <= n
 				upper_ = upper_.old_
-				across 1 |..| sequence.count as i all not (idx (index) <= i.item and i.item < idx (index + j)) implies
-					sequence [i.item] = sequence.old_ [i.item] end
-				across 1 |..| sequence.count as i all idx (index) <= i.item and i.item < idx (index + j) implies
-					sequence [i.item] = other.sequence [i.item - idx (index) + other.idx (other_first)] end
+				across 1 |..| sequence.count as i all not (idx (index) <= i and i < idx (index + j)) implies
+					sequence [i] = sequence.old_ [i] end
+				across 1 |..| sequence.count as i all idx (index) <= i and i < idx (index + j) implies
+					sequence [i] = other.sequence [i - idx (index) + other.idx (other_first)] end
 				modify_model (["index_", "sequence"], it)
 				modify_model ("index_", other_it)
 				modify_model ("sequence", Current)
@@ -176,10 +174,12 @@ feature -- Replacement
 			other.forget_iterator (other_it)
 			forget_iterator (it)
 		ensure
+			modify_model (["sequence", "observers"], Current)
+			modify_model ("observers", other)
 			sequence_domain_effect: sequence.count = old sequence.count
-			sequence_effect: across 1 |..| sequence.count as i all if idx (index) <= i.item and i.item < idx (index + other_last - other_first + 1)
-					then sequence [i.item] = other.sequence [i.item - idx (index) + other.idx (other_first)]
-					else sequence [i.item] = (old sequence) [i.item] end end
+			sequence_effect: across 1 |..| sequence.count as i all if idx (index) <= i and i < idx (index + other_last - other_first + 1)
+					then sequence [i] = other.sequence [i - idx (index) + other.idx (other_first)]
+					else sequence [i] = (old sequence) [i] end end
 			observers_restored: observers ~ old observers
 			other_observers_restored: other.observers ~ old other.observers
 		end
@@ -189,8 +189,7 @@ feature -- Replacement
 		note
 			status: nonvariant
 		require
-			observers_open: across observers as o all o.item.is_open end
-			modify_model (["sequence"], Current)
+			observers_open: across observers as o all o.is_open end
 		local
 			j, k: INTEGER
 		do
@@ -201,9 +200,9 @@ feature -- Replacement
 				upper_ = upper_.old_
 				lower_ <= j and j <= k + 1 and k <= upper_
 				k = lower_ + upper_ - j
-				across idx (j) |..| idx (k) as i all sequence [i.item] = sequence.old_ [i.item] end
-				across 1 |..| idx (j - 1) as i all sequence [i.item] = sequence.old_ [sequence.count - i.item + 1] end
-				across idx (k + 1) |..| sequence.count as i all sequence [i.item] = sequence.old_ [sequence.count - i.item + 1] end
+				across idx (j) |..| idx (k) as i all sequence [i] = sequence.old_ [i] end
+				across 1 |..| idx (j - 1) as i all sequence [i] = sequence.old_ [sequence.count - i + 1] end
+				across idx (k + 1) |..| sequence.count as i all sequence [i] = sequence.old_ [sequence.count - i + 1] end
 				is_wrapped
 				observers ~ observers.old_
 			until
@@ -214,8 +213,9 @@ feature -- Replacement
 				k := k - 1
 			end
 		ensure
+			modify_model (["sequence"], Current)
 			sequence_domain_effect: sequence.count = old sequence.count
-			sequence_effect: across 1 |..| sequence.count as i all sequence [i.item] = (old sequence) [sequence.count - i.item + 1] end
+			sequence_effect: across 1 |..| sequence.count as i all sequence [i] = (old sequence) [sequence.count - i + 1] end
 		end
 
 note

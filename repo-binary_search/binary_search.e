@@ -45,8 +45,8 @@ feature -- Binary search
 			invariant
 				low_and_up_range: 1 <= low and low <= up and up <= a.sequence.count + 1
 				result_range: Result = 0 or 1 <= Result and Result <= a.sequence.count
-				not_in_lower_part: across 1 |..| (low-1) as i all a.sequence[i.item] < value end
-				not_in_upper_part: across up |..| a.sequence.count as i all value < a.sequence[i.item] end
+				not_in_lower_part: across 1 |..| (low-1) as i all a.sequence[i] < value end
+				not_in_upper_part: across up |..| a.sequence.count as i all value < a.sequence[i] end
 				found: Result > 0 implies a.sequence[Result] = value
 			until
 				low >= up or Result > 0
@@ -127,7 +127,7 @@ feature -- Specification
 		do
 			Result := across 1 |..| s.count as i all
 						across 1 |..| s.count as j all
-							i.item <= j.item implies s[i.item] <= s[j.item] end end
+							i <= j implies s[i] <= s[j] end end
 		end
 
 end

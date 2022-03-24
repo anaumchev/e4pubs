@@ -31,9 +31,7 @@ feature -- Operations
 			-- Change `master_rate' to `new_rate'; update all accounts accordingly.
 		require
 			non_negative: new_rate >= 0
-			accounts_wrapped: across accounts.sequence as o all o.item.is_wrapped end
-			modify_field (["master_rate", "closed"], Current)
-			modify_field (["interest_rate", "closed"], accounts.sequence)
+			accounts_wrapped: across accounts.sequence as o all o.is_wrapped end
 		local
 			i: INTEGER
 		do
@@ -43,8 +41,8 @@ feature -- Operations
 			from
 				i := 1
 			invariant
-				across i |..| accounts.sequence.count as j all accounts.sequence [j.item].inv_without ("consistent_rate") end
-				across 1 |..| (i - 1) as j all accounts.sequence [j.item].inv end
+				across i |..| accounts.sequence.count as j all accounts.sequence [j].inv_without ("consistent_rate") end
+				across 1 |..| (i - 1) as j all accounts.sequence [j].inv end
 				modify_field (["interest_rate"], accounts.sequence)
 			until
 				i > accounts.count
@@ -55,8 +53,10 @@ feature -- Operations
 
 			wrap_all (observers)
 		ensure
+			modify_field (["master_rate", "closed"], Current)
+			modify_field (["interest_rate", "closed"], accounts.sequence)
 			rate_set: master_rate = new_rate
-			accounts_wrapped: across accounts.sequence as o all o.item.is_wrapped end
+			accounts_wrapped: across accounts.sequence as o all o.is_wrapped end
 		end
 
 
@@ -81,7 +81,7 @@ invariant
 	non_negative_rate: 0 <= master_rate
 	accounts_exist: accounts /= Void
 
-	owns = [ accounts ]
+	owns = create {MML_SET [ANY]} & accounts
 		-- The *list* of accounts is part of the bank's internal representation.
 
 	observers = accounts.sequence.range

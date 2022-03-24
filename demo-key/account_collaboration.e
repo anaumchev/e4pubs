@@ -14,16 +14,15 @@ feature {NONE} -- Initialization
 			-- Create a new account with balance of 0,
 			-- managed by bank `b'.
 		note
-			status: creator  -- Only verify `make' as constructor.
-		require
-			modify (Current, b)
+			status: creator -- Only verify `make' as constructor.
 		do
 			balance := 0
-			create transactions.make  -- Empty list of transactions.
+			create transactions.make -- Empty list of transactions.
 			bank := b
 			bank.register_account (Current)
 			interest_rate := bank.master_rate -- Initial rate.
 		ensure
+			modify (Current, b)
 			balance_zero: balance = 0
 		end
 
@@ -82,10 +81,10 @@ feature {BANK} -- Implementation
 			open: is_open
 			inv_partially_holds: inv_without ("consistent_rate")
 			non_negative_master_rate: bank.inv_only ("non_negative_rate")
-			modify_field ("interest_rate", Current)
 		do
 			interest_rate := bank.master_rate
 		ensure
+			modify_field ("interest_rate", Current)
 			inv_holds: inv
 		end
 
@@ -104,9 +103,9 @@ feature {NONE} -- Implementation
 
 	transactions: SIMPLE_LIST [INTEGER]
 		-- History of transactions:
-		--           positive integer = deposited amount
-		--           negative integer = withdrawn amount
-		--           latest transactions in back of list
+		--      positive integer = deposited amount
+		--      negative integer = withdrawn amount
+		--      latest transactions in back of list
 
 
 feature -- Specification
@@ -126,12 +125,12 @@ invariant
 	balance_non_negative: balance >= 0
 
 	transactions /= Void
-	owns = [ transactions ]  -- The account controls access to list of transactions.
+	owns = create {MML_SET [ANY]} & transactions -- The account controls access to list of transactions.
 	balance = sum (transactions.sequence)
 
 	non_negative_rate: 0 <= interest_rate
 	bank_exists: bank /= Void
-	subjects_definition: subjects = [ bank ]
+	subjects_definition: subjects = create {MML_SET [ANY]} & bank
 	consistent_rate: interest_rate = bank.master_rate
 
 end

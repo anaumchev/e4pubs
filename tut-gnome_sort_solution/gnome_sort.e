@@ -15,7 +15,6 @@ feature -- Sorting
 			a_not_empty: a.count > 0
 			no_overflow: a.count < {INTEGER}.max_value
 
-			modify (a)
 		local
 			pos, t: INTEGER
 		do
@@ -45,6 +44,7 @@ feature -- Sorting
 				end
 			end
 		ensure
+			modify (a)
 			sorted: is_sorted (a.sequence)
 			permutation: is_permutation (a.sequence, old a.sequence)
 		end
@@ -69,7 +69,7 @@ feature -- Specification
 		do
 			Result := across lower |..| (upper) as i all
 						across lower |..| (upper) as j all
-							i.item <= j.item implies s[i.item] <= s[j.item] end end
+							i <= j implies s[i] <= s[j] end end
 		end
 
 	is_permutation (s1, s2: MML_SEQUENCE [INTEGER]): BOOLEAN

@@ -94,7 +94,6 @@ feature -- Element change
 		require
 			not_full: not is_full
 
-			modify_model ("sequence", Current)
 		do
 			data[free] := a_value
 			if free = data.count then
@@ -103,6 +102,7 @@ feature -- Element change
 				free := free + 1
 			end
 		ensure
+			modify_model ("sequence", Current)
 			definition: sequence = old sequence.extended (a_value)
 		end
 
@@ -111,7 +111,6 @@ feature -- Element change
 		require
 			not_empty: not is_empty
 
-			modify_model ("sequence", Current)
 		do
 			if start = data.count then
 				start := 1
@@ -119,16 +118,16 @@ feature -- Element change
 				start := start + 1
 			end
 		ensure
+			modify_model ("sequence", Current)
 			definition: sequence = old sequence.but_first
 		end
 
 	wipe_out
 			-- Remove all elements from buffer.
-		require
-			modify_model ("sequence", Current)
 		do
 			start := free
 		ensure
+			modify_model ("sequence", Current)
 			empty: is_empty
 		end
 
@@ -162,7 +161,7 @@ feature {NONE} -- Implementation
 invariant
 
 	data_not_void: data /= Void
-	owns_definition: owns = [data]
+	owns_definition: owns = create {MML_SET [ANY]} & data
 
 	free_in_bounds: 1 <= free and free <= data.count
 	start_in_bounds: 1 <= start and start <= data.count

@@ -30,8 +30,6 @@ feature {NONE} -- Initialization
 			t_wrapped: t.is_wrapped
 			no_observers: observers.is_empty
 			not_observing_t: not t.observers [Current]
-			modify_field (["observers", "closed"], t)
-			modify (Current)
 		do
 			target := t
 			t.unwrap
@@ -40,6 +38,8 @@ feature {NONE} -- Initialization
 			t.wrap
 			wrap
 		ensure
+			modify_field (["observers", "closed"], t)
+			modify (Current)
 			wrapped: is_wrapped
 			t_wrapped: t.is_wrapped
 			target_effect: target = t
@@ -58,8 +58,6 @@ feature -- Initialization
 			target_wrapped: target.is_wrapped
 			other_target_wrapped: other.target.is_wrapped
 			target /= other.target implies not other.target.observers [Current]
-			modify (Current)
-			modify_model ("observers", [target, other.target])
 		do
 			if Current /= other then
 				if target /= other.target then
@@ -70,6 +68,8 @@ feature -- Initialization
 				go_to_other (other)
 			end
 		ensure
+			modify (Current)
+			modify_model ("observers", [target, other.target])
 			target_effect: target = old other.target
 			index_effect: index_ = old other.index_
 			old_target_wrapped: (old target).is_wrapped
@@ -203,7 +203,6 @@ feature {V_CONTAINER, V_ITERATOR} -- Implementation
 			other /= Current
 			same_target: target = other.target
 			target_wrapped: target.is_wrapped
-			modify_model ("index_", Current)
 		do
 			unwrap
 			check other.inv_only ("owns_definition", "targets_connected", "same_sequence", "same_index") end
@@ -220,6 +219,7 @@ feature {V_CONTAINER, V_ITERATOR} -- Implementation
 			end
 			wrap
 		ensure
+			modify_model ("index_", Current)
 			is_wrapped
 			index_effect: index_ = old other.index_
 		end
@@ -237,7 +237,7 @@ feature -- Specification
 invariant
 	sequence_definition: sequence ~ target.sequence
 	iterator_exists: iterator /= Void
-	owns_definition: owns = [ iterator ]
+	owns_definition: owns = create {MML_SET [ANY]} & iterator
 	targets_connected: target.list = iterator.target
 	same_sequence: sequence ~ iterator.sequence
 	same_index: index_ = iterator.index_

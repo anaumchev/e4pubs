@@ -25,16 +25,16 @@ feature {NONE} -- Initialization
 				i := 1
 			invariant
 				squares.is_wrapped and squares.is_fully_writable
-				squares.lower = 1 and squares.sequence.count = Square_count and squares.observers = []
+				squares.lower = 1 and squares.sequence.count = Square_count and squares.observers.is_empty
 				1 <= i and i <= Square_count + 1
 
 				across 1 |..| (i-1) as k all
-					squares.sequence[k.item].is_wrapped and
-					squares.sequence[k.item].is_fresh
+					squares.sequence[k].is_wrapped and
+					squares.sequence[k].is_fresh
 				end
 				across 1 |..| (i-1) as j all
 					across 1 |..| (i-1) as k all
-						j.item /= k.item implies squares.sequence[j.item] /= squares.sequence[k.item] end end
+						j /= k implies squares.sequence[j] /= squares.sequence[k] end end
 
 				modify (squares)
 			until
@@ -74,14 +74,14 @@ feature -- Output
 			across
 				squares as c
 			loop
-				Result.append (c.item.out_)
+				Result.append (c.out_)
 			end
 		end
 
 invariant
 	squares_exists: squares /= Void
 	owns_squares: owns.has (squares)
-	owns_def: owns = {MML_SET [ANY]}[squares.sequence.range] + [squares]
+	owns_def: owns = {MML_SET [ANY]}[squares.sequence.range] & squares
 	squares_bounds: squares.lower = Start_position and squares.sequence.count = Square_count
 	squares_exist: squares.sequence.non_void
 	squares_distinct: squares.sequence.no_duplicates

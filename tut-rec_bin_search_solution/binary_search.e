@@ -12,7 +12,7 @@ feature -- Basic operations
 		require
 			sorted: across 1 |..| a.sequence.count as i all
 						across 1 |..| a.sequence.count as j all
-							i.item <= j.item implies a.sequence[i.item] <= a.sequence[j.item] end end
+							i <= j implies a.sequence[i] <= a.sequence[j] end end
 		do
 			if a.count > 0 then
 				Result := binary_search_recursive_step (a, value, 1, a.count)
@@ -31,7 +31,7 @@ feature -- Basic operations
 		require
 			sorted: across 1 |..| a.sequence.count as i all
 						across 1 |..| a.sequence.count as j all
-							i.item <= j.item implies a.sequence[i.item] <= a.sequence[j.item] end end
+							i <= j implies a.sequence[i] <= a.sequence[j] end end
 			lower_in_bounds: 1 <= lower and lower <= a.count + 1
 			upper_in_bounds: 0 <= upper and upper <= a.count
 
@@ -68,7 +68,7 @@ feature -- Alternative encoding of postcondition
 		require
 			sorted: across 1 |..| a.sequence.count as i all
 						across 1 |..| a.sequence.count as j all
-							i.item <= j.item implies a.sequence[i.item] <= a.sequence[j.item] end end
+							i <= j implies a.sequence[i] <= a.sequence[j] end end
 		do
 			if a.count > 0 then
 				Result := binary_search_recursive_step_alt (a, value, 1, a.count)
@@ -76,9 +76,9 @@ feature -- Alternative encoding of postcondition
 				Result := 0
 			end
 		ensure
-            result_range: 0 <= Result and Result <= a.count
-			present: (across 1 |..| a.sequence.count as i some a.sequence[i.item] = value end) = (Result > 0)
-			not_present: (across 1 |..| a.sequence.count as i all a.sequence[i.item] /= value end) = (Result = 0)
+      result_range: 0 <= Result and Result <= a.count
+			present: (across 1 |..| a.sequence.count as i some a.sequence[i] = value end) = (Result > 0)
+			not_present: (across 1 |..| a.sequence.count as i all a.sequence[i] /= value end) = (Result = 0)
 			found_if_present: Result > 0 implies a.sequence[Result] = value
 		end
 
@@ -87,7 +87,7 @@ feature -- Alternative encoding of postcondition
 		require
 			sorted: across 1 |..| a.sequence.count as i all
 						across 1 |..| a.sequence.count as j all
-							i.item <= j.item implies a.sequence[i.item] <= a.sequence[j.item] end end
+							i <= j implies a.sequence[i] <= a.sequence[j] end end
 			lower_in_bounds: 1 <= lower and lower <= a.count + 1
 			upper_in_bounds: 0 <= upper and upper <= a.count
 
@@ -109,8 +109,8 @@ feature -- Alternative encoding of postcondition
 			end
 		ensure
 			result_range: Result = 0 or (lower <= Result and Result <= upper)
-			present: (across lower |..| upper as i some a.sequence[i.item] = value end) = (Result > 0)
-			not_present: (across lower |..| upper as i all a.sequence[i.item] /= value end) = (Result = 0)
+			present: (across lower |..| upper as i some a.sequence[i] = value end) = (Result > 0)
+			not_present: (across lower |..| upper as i all a.sequence[i] /= value end) = (Result = 0)
 			found_if_present: Result > 0 implies a.sequence[Result] = value
 		end
 end

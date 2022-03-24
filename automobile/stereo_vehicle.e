@@ -32,5 +32,5 @@ feature	-- Basic operations
 invariant
 	volvo_exists: volvo /= Void
 	fiat_exists: fiat /= Void
-	owns_definition: owns = [volvo, fiat]
+	owns_definition: owns = create {MML_SET [ANY]} & volvo & fiat
 end

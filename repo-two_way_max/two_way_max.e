@@ -18,8 +18,8 @@ feature
 				y := a.count
 			invariant
 				x_and_y_in_range: 1 <= x and x <= y and y <= a.count
-				max_front: across 1 |..| x as i all a.sequence[i.item] <= a[x] or a.sequence[i.item] <= a[y] end
-				max_back: across y |..| a.count as i all a.sequence[i.item] <= a[x] or a.sequence[i.item] <= a[y] end
+				max_front: across 1 |..| x as i all a.sequence[i] <= a[x] or a.sequence[i] <= a[y] end
+				max_back: across y |..| a.count as i all a.sequence[i] <= a[x] or a.sequence[i] <= a[y] end
 			until
 				x = y
 			loop
@@ -34,8 +34,8 @@ feature
 			Result := x
 		ensure
 			result_in_range: 1 <= Result and Result <= a.count
-			result_is_max: across 1 |..| a.count as i all a.sequence[i.item] <= a[Result] end
-			result_is_max: across a.sequence as i all i.item <= a[Result] end
+			result_is_max: across 1 |..| a.count as i all a.sequence[i] <= a[Result] end
+			result_is_max: across a.sequence as i all i <= a[Result] end
 		end
 
 end

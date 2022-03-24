@@ -15,12 +15,12 @@ feature {NONE} -- Initialization
 			status: creator
 		require
 			s_exists: s /= Void
-			modify (s, Current)
 		do
 			subject := s
 			s.register (Current)
 			cache := s.value
 		ensure
+			modify (s, Current)
 			subject_set: subject = s
 			observeing_subject: s.observers = old s.observers & Current
 		end
@@ -40,16 +40,16 @@ feature {SUBJECT} -- Internal communication
 		require
 			open: is_open
 			partially_holds: inv_without ("cache_synchronized")
-			modify_field ("cache", Current)
 		do
 			cache := subject.value
 		ensure
+			modify_field ("cache", Current)
 			invariant_holds: inv
 		end
 
 invariant
 	subject_exists: subject /= Void
-	subjects_structure: subjects = [subject]
+	subjects_structure: subjects = create {MML_SET [ANY]} & subject
 	subject_aware: subject.observers.has (Current)
 	cache_synchronized: cache = subject.value
 end

@@ -22,10 +22,10 @@ feature -- Test
 	work_it (a: AUTOMOBILE)
 		note
 			status: nonvariant
-		require
-			modify (a)
 		do
 			a.drive
+		ensure
+			modify (a)
 		end
 
 end

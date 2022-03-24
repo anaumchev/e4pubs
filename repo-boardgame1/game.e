@@ -26,17 +26,17 @@ feature {NONE} -- Initialization
 			invariant
 				players.is_fully_writable and players.is_wrapped
 				inv_only ("players_bounds")
-				players.observers = []
-				1 <=  i and i <= players.count + 1
+				players.observers.is_empty
+				1 <= i and i <= players.count + 1
 				across 1 |..| (i-1) as k all
-					players.sequence[k.item] /= Void and
-					players.sequence[k.item].is_wrapped and
-					players.sequence[k.item].is_fresh and
-					players.sequence[k.item].position = 1
+					players.sequence[k] /= Void and
+					players.sequence[k].is_wrapped and
+					players.sequence[k].is_fresh and
+					players.sequence[k].position = 1
 				end
 				across 1 |..| (i-1) as j all
 					across 1 |..| (i-1) as k all
-						j.item /= k.item implies players.sequence[j.item] /= players.sequence[k.item] end end
+						j /= k implies players.sequence[j] /= players.sequence[k] end end
 
 				modify (players)
 			until
@@ -55,7 +55,7 @@ feature {NONE} -- Initialization
 			create die_2.roll
 		ensure
 			not_yet_played: winner = Void
-			fair_start: across players.sequence as o all o.item.position = 1 end
+			fair_start: across players.sequence as o all o.position = 1 end
 		end
 
 feature -- Basic operations
@@ -64,12 +64,9 @@ feature -- Basic operations
 			-- Start a game.
 		require
 			not_yet_played: winner = Void
-			fair_start: across players.sequence as o all o.item.position = 1 end
-
-			modify_field (["closed", "winner"], Current)
+			fair_start: across players.sequence as o all o.position = 1 end
 		local
 			round, i: INTEGER
-			p1_old_position: INTEGER
 		do
 			from
 				round := 1
@@ -78,8 +75,8 @@ feature -- Basic operations
 			invariant
 				players.sequence = players.sequence.old_
 				inv_only("players_bounds", "owns_def")
-				across owns as o all o.item.is_wrapped end
-				across owns as o all o.item.is_fully_writable end
+				across owns as o all o.is_wrapped end
+				across owns as o all o.is_fully_writable end
 				players.inv_only ("lower_definition", "upper_definition")
 
 				is_winner: winner /= Void implies winner.position > Square_count
@@ -96,8 +93,8 @@ feature -- Basic operations
 				invariant
 					players.sequence = players.sequence.old_
 					inv_only("players_bounds", "owns_def")
-					across owns as o all o.item.is_wrapped end
-					across owns as o all o.item.is_fully_writable end
+					across owns as o all o.is_wrapped end
+					across owns as o all o.is_fully_writable end
 					players.inv_only ("lower_definition", "upper_definition")
 
 					1 <= i and i <= players.count + 1
@@ -118,6 +115,7 @@ feature -- Basic operations
 				round := round + 1
 			end
 		ensure
+			modify_field (["closed", "winner"], Current)
 			players.sequence = old players.sequence
 			is_winner: winner.position > Square_count
 			has_winner: winner /= Void and players.sequence.has (winner)
@@ -155,8 +153,7 @@ feature {NONE} -- Implementation
 		require
 			inv_only("players_bounds", "owns_def")
 			players.inv_only ("lower_definition", "upper_definition")
-			across owns as o all o.item.is_wrapped end
-			modify ([])
+			across owns as o all o.is_wrapped end
 		local
 			i, j: INTEGER
 			board: V_STRING
@@ -183,13 +180,15 @@ feature {NONE} -- Implementation
 				io.put_new_line
 				i := i + 1
 			end
+		ensure
+			modify ([])
 		end
 
 invariant
 	dice_exist: die_1 /= Void and die_2 /= Void
 	players_exist: players /= Void
 	owns_players: owns.has (players) -- needed to be able to read `players.sequence' in next line
-	owns_def: owns = {MML_SET [ANY]}[players.sequence.range] + [players, die_1, die_2]
+	owns_def: owns = {MML_SET [ANY]}[players.sequence.range] & players & die_1 & die_2
 	players_bounds: players.lower_ = 1 and Min_player_count <= players.sequence.count and players.sequence.count <= Max_player_count
 	players_nonvoid: players.sequence.non_void
 	players_distinct: players.sequence.no_duplicates

@@ -11,7 +11,7 @@
 -- Note: for each loop, add an invariant 'modify_field ("x", Current)'.
 -- Note: for each call f, add a call 'wrap' before the call and 'unwrap' after the call.
 -- Note: to skip the termination check add the following precondition (for recursion) 
---       or loop invariant (for loops): 'decreases([])'
+--    or loop invariant (for loops): 'decreases([])'
 
 class AXIOMATIC_SEMANTICS
 

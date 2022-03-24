@@ -54,12 +54,12 @@ feature -- Access
 		note
 			status: functional, ghost
 		require
-			nodes_exist: across nodes as n all n.item /= Void end
+			nodes_exist: across nodes as n all n /= Void end
 			reads (nodes)
 		do
 			Result :=
 				v >= init_v and
-				across nodes as n all n.item.value <= v end and
+				across nodes as n all n.value <= v end and
 				((max_node = Void and v = init_v) or (nodes [max_node] and then max_node.value = v))
 		end
 
@@ -71,13 +71,10 @@ feature -- Access
 			n_exists: n /= Void
 			n_different: n /= Current
 			n_orphan: n.parent = Void
-			ancestors_wrapped: across ancestors as p all p.item.is_wrapped end
+			ancestors_wrapped: across ancestors as p all p.is_wrapped end
 			ancestors_has_current: ancestors [Current]
-			ancestors_closed: across ancestors as p all p.item.parent /= Void implies ancestors [p.item.parent] end
+			ancestors_closed: across ancestors as p all p.parent /= Void implies ancestors [p.parent] end
 
-			modify_field (["value", "max_child", "closed"], ancestors)
-			modify_field (["children", "subjects", "observers"], Current)
-			modify_field (["parent", "subjects", "observers", "closed"], n)
 		do
 			unwrap
 			n.unwrap
@@ -97,11 +94,14 @@ feature -- Access
 				wrap
 			end
 		ensure
+			modify_field (["value", "max_child", "closed"], ancestors)
+			modify_field (["children", "subjects", "observers"], Current)
+			modify_field (["parent", "subjects", "observers", "closed"], n)
 			n_parent_set: n.parent = Current
 			n_value_unchanged: n.value = old n.value
 			children_set: children = old children & n
 			max_child_set: max_child = if old (value >= n.value) then old max_child else n end
-			ancestors_wrapped: across ancestors as p all p.item.is_wrapped end
+			ancestors_wrapped: across ancestors as p all p.is_wrapped end
 		end
 
 feature {NODE} -- Implementation
@@ -113,10 +113,10 @@ feature {NODE} -- Implementation
 			no_parent: parent = Void
 			p_exists: p /= Void
 			observers = children.range
-			modify_field (["parent"], Current)
 		do
 			parent := p
 		ensure
+			modify_field (["parent"], Current)
 			parent_set: parent = p
 		end
 
@@ -130,13 +130,11 @@ feature {NODE} -- Implementation
 			child_value: child.value = d.value
 			value_consistency_broken: child.value > value
 			c_is_new_max: is_max (child.value, init_value, children.range, child)
-			visited_fixed: across visited as o all o.item.is_wrapped and o.item.value = d.value end
-			direct_ancestors_wrapped: across ancestors as p all p.item /= Current implies p.item.is_wrapped end
+			visited_fixed: across visited as o all o.is_wrapped and o.value = d.value end
+			direct_ancestors_wrapped: across ancestors as p all p /= Current implies p.is_wrapped end
 			ancestors_has_current: ancestors [Current]
-			ancestors_closed: across ancestors as p all p.item.parent /= Void implies ancestors [p.item.parent] end
+			ancestors_closed: across ancestors as p all p.parent /= Void implies ancestors [p.parent] end
 
-			modify_field ("closed", ancestors)
-			modify_field (["value", "max_child"], (ancestors - visited) / d)
 			decreases (ancestors - visited)
 		do
 			if parent /= Void then
@@ -153,16 +151,18 @@ feature {NODE} -- Implementation
 				end
 			end
 		ensure
+			modify_field ("closed", ancestors)
+			modify_field (["value", "max_child"], (ancestors - visited) / d)
 			value_set: value = d.value
 			max_child_set: max_child = child
 			d_value_unchnaged: d.value = old d.value
-			ancestors_wrapped: across ancestors as p all p.item.is_wrapped end
+			ancestors_wrapped: across ancestors as p all p.is_wrapped end
 		end
 
 invariant
 	subjects_structure: subjects = if parent = Void then children.range else children.range & parent end
 	parent_consistent: parent /= Void implies parent.children.has (Current)
-	children_consistent: across children as c all c.item /= Void and then c.item.parent = Current end
+	children_consistent: across children as c all c /= Void and then c.parent = Current end
 	value_consistent: is_max (value, init_value, children.range, max_child)
 	no_direct_cycles: parent /= Current
 	observers_structure: observers = subjects

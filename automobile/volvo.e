@@ -29,6 +29,6 @@ feature -- Basic operations
 
 invariant
 	odometer_exists: odometer /= Void
-	owns_definition: owns = [odometer]
+	owns_definition: owns = create {MML_SET [ANY]} & odometer
 
 end

@@ -30,7 +30,7 @@ feature {NONE} -- Implementation
 			-- Random sequence.
 
 invariant
-	owns_def: owns = [random]
+	owns_def: owns = create {MML_SET [ANY]} & random
 	face_value_valid: face_value >= 1 and face_value <= Face_count
 
 end

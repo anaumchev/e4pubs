@@ -20,7 +20,7 @@ feature {NONE} -- Initialization
 		ensure
 			capacity_set: capacity = c
 			empty: count = 0
-			no_observers: observers = []
+			no_observers: observers.is_empty
 		end
 
 feature -- Access
@@ -41,19 +41,19 @@ feature -- Element change
 	add (v: INTEGER)
 			-- Add `v' to the collection.
 		require
-			observers_wrapped: across observers as o all o.item.is_wrapped end
+			observers_wrapped: across observers as o all o.is_wrapped end
 			not_full: count < capacity
-			modify (Current)
-			modify_field ("closed", observers)
 		do
 			unwrap_all (observers)
-			set_observers ([])
+			set_observers (create {MML_SET [ANY]})
 			count := count + 1
 			elements.put (v, count)
 		ensure
+			modify (Current)
+			modify_field ("closed", observers)
 			count_increased: count = old count + 1
-			no_observers: observers = []
-			old_observers_open: across old observers as o all o.item.is_open end
+			no_observers: observers.is_empty
+			old_observers_open: across old observers as o all o.is_open end
 			elements_unchanged: elements = old elements
 			capacity_unchanged: capacity = old capacity
 		end
@@ -61,18 +61,18 @@ feature -- Element change
 	remove_last
 			-- Remove the last added elements from the collection.
 		require
-			observers_wrapped: across observers as o all o.item.is_wrapped end
+			observers_wrapped: across observers as o all o.is_wrapped end
 			not_empty: count > 0
-			modify (Current)
-			modify_field ("closed", observers)
 		do
 			unwrap_all (observers)
-			set_observers ([])
+			set_observers (create {MML_SET [ANY]})
 			count := count - 1
 		ensure
+			modify (Current)
+			modify_field ("closed", observers)
 			count_decreased: count = old count - 1
-			no_observers: observers = []
-			old_observers_open: across old observers as o all o.item.is_open end
+			no_observers: observers.is_empty
+			old_observers_open: across old observers as o all o.is_open end
 			elements_unchanged: elements = old elements
 			capacity_unchanged: capacity = old capacity
 		end
@@ -84,8 +84,8 @@ feature {MY_ITERATOR} -- Implementation
 
 invariant
 	elements /= Void
-	owns = [elements]
+	owns = create {MML_SET [ANY]} & elements
 	0 <= count and count <= elements.sequence.count
-	across observers as o all attached o.item and o.item /= Current end
+	across observers as o all attached o and o /= Current end
 
 end

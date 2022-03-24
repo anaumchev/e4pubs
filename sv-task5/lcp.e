@@ -1,8 +1,8 @@
 -- The LCP class implements a Longest Common Prefix algorithm with
 -- input and output defined as follows:
---   Input: an integer array a, and two indices x and y into this array
---   Output: length of longest common prefix of the subarrays of a
---           starting at x and y respectively.
+--  Input: an integer array a, and two indices x and y into this array
+--  Output: length of longest common prefix of the subarrays of a
+--      starting at x and y respectively.
 -- What can you prove about it?
 
 class
@@ -17,7 +17,6 @@ feature
 		require
 			-- TODO: Preconditions
 
-			modify ([]) -- This function does not modify anything.
 		do
 			from
 				Result := 0
@@ -33,6 +32,7 @@ feature
 				a.count - Result + 1
 			end
 		ensure
+			modify ([]) -- This function does not modify anything.
 			-- TODO: Postconditions
 		end
 

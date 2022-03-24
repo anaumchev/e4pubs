@@ -22,7 +22,7 @@ feature -- Helper functions
 			a.sequence.count = b.sequence.count
 			0 < r and r < a.sequence.count
 		do
-			Result := across 1 |..| a.sequence.count as i all a.sequence[i.item] = b.sequence[wrapped_index(i.item + a.sequence.count - r, a.sequence.count)] end
+			Result := across 1 |..| a.sequence.count as i all a.sequence[i] = b.sequence[wrapped_index(i + a.sequence.count - r, a.sequence.count)] end
 		end
 
 feature -- Rotation by copy
@@ -37,7 +37,6 @@ feature -- Rotation by copy
 			1 < a.sequence.count
 			0 < r and r < a.sequence.count
 
-			modify ([])
 		local
 			s, d: INTEGER
 		do
@@ -51,7 +50,7 @@ feature -- Rotation by copy
 				1 <= s and s <= a.count + 1
 				1 <= d and d <= a.count
 				d = wrapped_index (s + a.count - r, a.count)
-				across 1 |..| (s-1) as i all a.sequence[i.item] = Result.sequence[wrapped_index(i.item + a.count - r, a.count)] end
+				across 1 |..| (s-1) as i all a.sequence[i] = Result.sequence[wrapped_index(i + a.count - r, a.count)] end
 			until
 				s >= a.count + 1
 			loop
@@ -63,6 +62,7 @@ feature -- Rotation by copy
 				end
 			end
 		ensure
+			modify ([])
 			is_rotation (a, Result, r)
 		end
 
@@ -78,13 +78,13 @@ feature -- Rotation by reversal
 			a.sequence.count > 0
 			0 < r and r < a.sequence.count
 
-			modify ([])
 		do
 			create Result.init (a.sequence)
 			Result := reverse_inplace (Result, 1, r)
 			Result := reverse_inplace (Result, r + 1, Result.count)
 			Result := reverse_inplace (Result, 1, a.count)
 		ensure
+			modify ([])
 			is_rotation (a, Result, r)
 		end
 
@@ -105,7 +105,6 @@ feature -- Rotation by reversal
 			a.is_wrapped
 			1 <= low and low <= high and high <= a.count
 
-			modify ([])
 		local
 			p, q: INTEGER
 			t: G
@@ -121,11 +120,11 @@ feature -- Rotation by reversal
 				low <= p and p <= q + 2 and q <= high
 
 				q = reverse_position(p, low, high)
-				across low |..| (p-1) as i all a.sequence[i.item] = Result.sequence[reverse_position(i.item, low, high)] end
-				across (q+1) |..| high as i all a.sequence[i.item] = Result.sequence[reverse_position(i.item, low, high)] end
-				across p |..| q as i all a.sequence[i.item] = Result.sequence[i.item] end
-				across 1 |..| (low-1) as i all a.sequence[i.item] = Result.sequence[i.item] end
-				across (high+1) |..| a.count as i all a.sequence[i.item] = Result.sequence[i.item] end
+				across low |..| (p-1) as i all a.sequence[i] = Result.sequence[reverse_position(i, low, high)] end
+				across (q+1) |..| high as i all a.sequence[i] = Result.sequence[reverse_position(i, low, high)] end
+				across p |..| q as i all a.sequence[i] = Result.sequence[i] end
+				across 1 |..| (low-1) as i all a.sequence[i] = Result.sequence[i] end
+				across (high+1) |..| a.count as i all a.sequence[i] = Result.sequence[i] end
 			until
 				p >= q
 			loop
@@ -138,11 +137,12 @@ feature -- Rotation by reversal
 				q - p
 			end
 		ensure
+			modify ([])
 			Result.is_wrapped
 			Result.count = a.count
-			across 1 |..| (low-1) as i all a.sequence[i.item] = Result.sequence[i.item] end
-			across (high+1) |..| a.count as i all a.sequence[i.item] = Result.sequence[i.item] end
-			across low |..| (high) as i all a.sequence[i.item] = Result.sequence[reverse_position(i.item, low, high)] end
+			across 1 |..| (low-1) as i all a.sequence[i] = Result.sequence[i] end
+			across (high+1) |..| a.count as i all a.sequence[i] = Result.sequence[i] end
+			across low |..| (high) as i all a.sequence[i] = Result.sequence[reverse_position(i, low, high)] end
 		end
 
 end

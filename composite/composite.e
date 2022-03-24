@@ -69,12 +69,12 @@ feature -- Access
 		note
 			status: functional, ghost
 		require
-			nodes_exist: across nodes as n all n.item /= Void  end
+			nodes_exist: across nodes as n all n /= Void end
 			reads (nodes)
 		do
 			Result :=
 				v >= init_v and
-				across nodes as n all n.item.value <= v end and
+				across nodes as n all n.value <= v end and
 				((max_node = Void and v = init_v) or (nodes [max_node] and then max_node.value = v))
 		end
 
@@ -88,10 +88,8 @@ feature -- Update
 			c_different: c /= Current
 			c_singleton_1: c.parent = Void
 			c_singleton_2: c.children.is_empty
-			ancestors_wrapped: across ancestors as p all p.item.is_wrapped end
-			observers_wrapped: across observers as o all o.item.is_wrapped end
-			modify (Current, c)
-			modify_field (["value", "max_child", "closed"], ancestors)
+			ancestors_wrapped: across ancestors as p all p.is_wrapped end
+			observers_wrapped: across observers as o all o.is_wrapped end
 		do
 			lemma_ancestors_have_children (c)
 			check c.inv end
@@ -111,12 +109,14 @@ feature -- Update
 			c.wrap
 			update (c)
 		ensure
+			modify (Current, c)
+			modify_field (["value", "max_child", "closed"], ancestors)
 			child_added: children.has (c)
 			c_value_unchanged: c.value = old c.value
 			c_children_unchanged: c.children_set = old c.children_set
 			ancestors_unchengd: ancestors = old ancestors
-			ancestors_wrapped: across ancestors as p all p.item.is_wrapped end
-			observers_wrapped: across observers as o all o.item.is_wrapped end
+			ancestors_wrapped: across ancestors as p all p.is_wrapped end
+			observers_wrapped: across observers as o all o.is_wrapped end
 		end
 
 feature {COMPOSITE} -- Implementation
@@ -127,11 +127,11 @@ feature {COMPOSITE} -- Implementation
 			open: is_open
 			p_exists: p /= Void
 			no_observers: observers.is_empty
-			modify_field (["parent", "ancestors"], Current)
 		do
 			parent := p
 			ancestors := p.ancestors & p
 		ensure
+			modify_field (["parent", "ancestors"], Current)
 			parent_set: parent = p
 			ancestors_set: ancestors = p.ancestors & p
 		end
@@ -143,13 +143,11 @@ feature {COMPOSITE} -- Implementation
 			c_is_child: children_set [c]
 			open: is_open
 			children_list_wrapped: children.is_wrapped
-			ancestors_wrapped: across ancestors as p all p.item.is_wrapped end
+			ancestors_wrapped: across ancestors as p all p.is_wrapped end
 			partially_holds: inv_without ("value_consistent")
 			almost_max: if value >= c.value
 				then is_max (value, init_value, children_set, max_child)
 				else is_max (c.value, init_value, children_set, c) end
-			modify_field (["value", "max_child", "closed"], Current, ancestors)
-			modify_field (["owner"], children)
 			decreases (ancestors)
 		do
 			if value < c.value then
@@ -166,8 +164,10 @@ feature {COMPOSITE} -- Implementation
 				wrap
 			end
 		ensure
+			modify_field (["value", "max_child", "closed"], Current, ancestors)
+			modify_field (["owner"], children)
 			wrapped: is_wrapped
-			ancestors_wrapped: across ancestors as p all p.item.is_wrapped end
+			ancestors_wrapped: across ancestors as p all p.is_wrapped end
 		end
 
 	lemma_ancestors_have_children (c: COMPOSITE)
@@ -177,7 +177,7 @@ feature {COMPOSITE} -- Implementation
 		require
 			c_exists: c /= Void
 			wrapped: is_wrapped
-			ancestors_wrapped: across ancestors as a all a.item.is_wrapped  end
+			ancestors_wrapped: across ancestors as a all a.is_wrapped end
 			decreases (ancestors)
 		do
 			check inv end
@@ -194,10 +194,10 @@ feature {COMPOSITE} -- Implementation
 
 invariant
 	children_exists: children /= Void
-	owns_structure: owns = [children]
+	owns_structure: owns = create {MML_SET [ANY]} & children
 	subjects_structure: subjects = if parent = Void then children_set else children_set & parent end
 	tree: not ancestors [Current]
-	children_consistent: across children_set as c all c.item /= Void and then c.item.parent = Current end
+	children_consistent: across children_set as c all c /= Void and then c.parent = Current end
 	ancestors_structure: ancestors = if parent = Void then {MML_SET [COMPOSITE]}.empty_set else parent.ancestors & parent end
 	value_consistent: is_max (value, init_value, children_set, max_child)
 	observers_structure: observers = subjects

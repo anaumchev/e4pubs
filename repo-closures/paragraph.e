@@ -24,17 +24,17 @@ feature
 			not is_left_aligned
 		end
 
-	format (proc: PROCEDURE [FORMATTER, TUPLE [PARAGRAPH]])
+	format (proc: PROCEDURE [PARAGRAPH])
 			-- Format the paragraph with the given formatter.
 		note
 			explicit: wrapping, contracts
 		require
 			pre: proc.precondition ([Current])
 
-			modify_agent (proc, [Current])
 		do
 			proc.call ([Current])
 		ensure
+			modify_agent (proc, [Current])
 			proc.postcondition ([Current])
 		end
 

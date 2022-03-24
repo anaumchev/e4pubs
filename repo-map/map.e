@@ -33,7 +33,7 @@ feature -- Access
 			Result := data.item (i)
 		ensure
 			across keys.sequence.domain as j some
-				k = keys.sequence[j.item] and Result = data.sequence[j.item]
+				k = keys.sequence[j] and Result = data.sequence[j]
 			end
 		end
 
@@ -87,8 +87,6 @@ feature -- Element change
 		note
 			status: impure
 			explicit: wrapping
-		require
-			modify (Current)
 		do
 			Result := index_of_key (k)
 			unwrap
@@ -104,6 +102,7 @@ feature -- Element change
 			end
 			wrap
 		ensure
+			modify (Current)
 			key_set: keys.sequence[Result] = k
 			data_set: data.sequence[Result] = v
 			other_keys_unchanged: keys.sequence.interval (1, Result-1) = old keys.sequence.interval (1, Result-1)
@@ -122,7 +121,6 @@ feature -- Element change
 			has_key (k)
 			not_empty: count > 0
 
-			modify (Current)
 		do
 			Result := index_of_key (k)
 			unwrap
@@ -130,6 +128,7 @@ feature -- Element change
 			data.remove_at (Result)
 			wrap
 		ensure
+			modify (Current)
 			result_is_index: old keys.sequence[Result] = k
 			key_removed: not keys.sequence.has (k)
 			other_keys_unchanged: keys.sequence.interval (1, Result-1) = old keys.sequence.interval (1, Result-1)
@@ -176,7 +175,7 @@ feature -- Implementation
 
 invariant
 	keys /= Void and data /= Void and keys /= data
-	owns = [keys, data]
+	owns = create {MML_SET [ANY]} & keys & data
 	key_data_sync: keys.sequence.count = data.sequence.count
 	no_duplicates: keys.sequence.to_bag.is_constant (1)
 

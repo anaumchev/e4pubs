@@ -20,8 +20,6 @@ feature -- Operations
 			status: creator
 		require
 			non_negative: c.item >= 0
-			modify (Current)
-			modify_field (["observers", "closed"], c)
 		do
 			cell := c
 
@@ -32,12 +30,14 @@ feature -- Operations
 			c.observers := c.observers & Current
 			c.wrap
 		ensure
+			modify (Current)
+			modify_field (["observers", "closed"], c)
 			cell_set: cell = c
 		end
 
 invariant
 	cell_non_void: cell /= Void
-	subject_definition: subjects = [cell]
+	subject_definition: subjects = create {MML_SET [ANY]} & cell
 --	subjects_observers_inverse: across subjects as s all s.item.observers [Current] end -- This clause is implicitly added by AutoProof;
 											-- it is required to make sure that all subjects
 											-- indeed take care of their observers.

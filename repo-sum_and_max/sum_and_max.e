@@ -12,9 +12,8 @@ feature
 			status: impure
 		require
 			a_not_void: a /= Void
-			natural_numbers: across 1 |..| a.count as ai all a.sequence[ai.item] >= 0 end
+			natural_numbers: across 1 |..| a.count as ai all a.sequence[ai] >= 0 end
 
-			modify ([])
 		local
 			i: INTEGER
 			sum, max: INTEGER
@@ -36,6 +35,7 @@ feature
 			end
 			Result := [sum, max]
 		ensure
+			modify ([])
 			sum_in_range: Result.sum <= a.count * Result.max
 		end
 

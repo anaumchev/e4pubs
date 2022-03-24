@@ -14,7 +14,6 @@ feature
 		require
 			a_not_empty: a.count > 0
 
-			modify ([])
 		local
 			x, y: INTEGER
 		do
@@ -23,8 +22,8 @@ feature
 				y := a.count
 			invariant
 				x_and_y_in_range: 1 <= x and x <= y and y <= a.count
-				max_until_x: across 1 |..| x as i all a.sequence[i.item] <= a.sequence[x] or a.sequence[i.item] <= a.sequence[y] end
-				max_until_y: across y |..| a.count as i all a.sequence[i.item] <= a.sequence[x] or a.sequence[i.item] <= a[y] end
+				max_until_x: across 1 |..| x as i all a.sequence[i] <= a.sequence[x] or a.sequence[i] <= a.sequence[y] end
+				max_until_y: across y |..| a.count as i all a.sequence[i] <= a.sequence[x] or a.sequence[i] <= a[y] end
 			until
 				x = y
 			loop
@@ -38,8 +37,9 @@ feature
 			end
 			Result := x
 		ensure
+			modify ([])
 			result_in_range: 1 <= Result and Result <= a.count
-			result_is_max: across 1 |..| a.count as i all a.sequence[i.item] <= a[Result] end
+			result_is_max: across 1 |..| a.count as i all a.sequence[i] <= a[Result] end
 		end
 
 end

@@ -47,20 +47,20 @@ feature -- Basic operations
 			explicit: wrapping
 		require
 			dice_exist: d1 /= Void and d2 /= Void
-			modify (Current, d1, d2)
 		do
 			d1.roll
 			d2.roll
 			set_position (position + d1.face_value + d2.face_value)
 			print (name + " rolled " + d1.face_value.out_ + " and " + d2.face_value.out_ + ". Moves to " + position.out_ + ".%N")
 		ensure
+			modify (Current, d1, d2)
 			position_increased: old position + {DIE}.Face_count + {DIE}.Face_count >= position and position >= old position + 2
 		end
 
 invariant
 	position_not_negative: position >= 0
 	name_not_void: name /= Void
-	owns_def: owns = [name]
+	owns_def: owns = create {MML_SET [ANY]} & name
 	name_exists: not name.sequence.is_empty
 
 end

@@ -42,10 +42,10 @@ feature -- Basic operations
 			limit_not_positive: limit <= 0
 			limit_valid: limit <= balance
 
-			modify_field (["credit_limit", "closed"], Current)
 		do
 			credit_limit := limit
 		ensure
+			modify_field (["credit_limit", "closed"], Current)
 			credit_limit_set: credit_limit = limit
 		end
 
@@ -54,10 +54,10 @@ feature -- Basic operations
 		require
 			amount_non_negative: amount >= 0
 
-			modify_field (["balance", "closed"], Current)
 		do
 			balance := balance + amount
 		ensure
+			modify_field (["balance", "closed"], Current)
 			balance_set: balance = old balance + amount
 		end
 
@@ -67,10 +67,10 @@ feature -- Basic operations
 			amount_not_negative: amount >= 0
 			amount_available: amount <= available_amount
 
-			modify_field (["balance", "closed"], Current)
 		do
 			balance := balance - amount
 		ensure
+			modify_field (["balance", "closed"], Current)
 			balance_set: balance = old balance - amount
 		end
 
@@ -83,11 +83,11 @@ feature -- Basic operations
 			amount_available: amount <= available_amount
 			no_aliasing: other /= Current
 
-			modify_field (["balance", "closed"], [Current, other])
 		do
 			withdraw (amount)
 			other.deposit (amount)
 		ensure
+			modify_field (["balance", "closed"], [Current, other])
 			withdrawal_made: balance = old balance - amount
 			despoit_made: other.balance = old other.balance + amount
 		end

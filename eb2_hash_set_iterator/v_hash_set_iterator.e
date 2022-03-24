@@ -29,8 +29,6 @@ feature {NONE} -- Initialization
 			t_wrapped: t.is_wrapped
 			no_observers: observers.is_empty
 			not_observing_t: not t.observers [Current]
-			modify_field (["observers", "closed"], t)
-			modify (Current)
 		do
 			target := t
 			t.unwrap
@@ -41,10 +39,12 @@ feature {NONE} -- Initialization
 
 			iterator.lemma_sequence_no_duplicates
 			iterator.sequence.lemma_no_duplicates
-			check across t.bag.domain as x all t.bag [x.item] = iterator.sequence.to_bag [x.item] end end
+			check across t.bag.domain as x all t.bag [x] = iterator.sequence.to_bag [x] end end
 
 			wrap
 		ensure
+			modify_field (["observers", "closed"], t)
+			modify (Current)
 			wrapped: is_wrapped
 			t_wrapped: t.is_wrapped
 			target_effect: target = t
@@ -63,8 +63,6 @@ feature -- Initialization
 			target_wrapped: target.is_wrapped
 			other_target_wrapped: other.target.is_wrapped
 			target /= other.target implies not other.target.observers [Current]
-			modify (Current)
-			modify_model ("observers", [target, other.target])
 		do
 			if Current /= other then
 				if target /= other.target then
@@ -81,6 +79,8 @@ feature -- Initialization
 				wrap
 			end
 		ensure
+			modify (Current)
+			modify_model ("observers", [target, other.target])
 			target_effect: target = old other.target
 			index_effect: index_ = old other.index_
 			old_target_wrapped: (old target).is_wrapped
@@ -232,7 +232,7 @@ feature -- Removal
 
 			check iterator.inv_only ("target_domain_constraint") end
 			iterator.sequence.to_bag.lemma_domain_count
-			check across target.bag.domain as x all target.bag [x.item] = iterator.sequence.to_bag [x.item] end end
+			check across target.bag.domain as x all target.bag [x] = iterator.sequence.to_bag [x] end end
 		end
 
 feature {V_CONTAINER, V_ITERATOR, V_LOCK} -- Implementation
@@ -242,7 +242,7 @@ feature {V_CONTAINER, V_ITERATOR, V_LOCK} -- Implementation
 
 invariant
 	iterator_exists: iterator /= Void
-	owns_definition: owns = [ iterator ]
+	owns_definition: owns = create {MML_SET [ANY]} & iterator
 	targets_connected: target.table = iterator.target
 	same_sequence: sequence ~ iterator.sequence
 	same_index: index_ = iterator.index_

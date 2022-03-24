@@ -5,7 +5,7 @@ feature
 	test_agents
 		local
 			a1, a2: ACCOUNT
-			p1, p2, p3: PROCEDURE [ANY, TUPLE []]
+			p1, p2, p3: PROCEDURE
 		do
 			create a1.make
 			create a2.make

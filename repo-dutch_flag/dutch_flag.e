@@ -12,10 +12,9 @@ feature -- Flag sort
 		note
 			status: impure
 		require
-			three_values: across a.sequence.domain as ai all a[ai.item]='b' or a[ai.item]='w' or a[ai.item]='r' end
+			three_values: across a.sequence.domain as ai all a[ai]='b' or a[ai]='w' or a[ai]='r' end
 			no_overflow: a.count < {INTEGER}.max_value
 
-			modify (a)
 		local
 			b, i, r: INTEGER
 		do
@@ -25,14 +24,14 @@ feature -- Flag sort
 				r := a.count
 			invariant
 				a_wrapped: a.is_wrapped
-				three_values: across a.sequence.domain as ai all a[ai.item]='b' or a[ai.item]='w' or a[ai.item]='r' end
+				three_values: across a.sequence.domain as ai all a[ai]='b' or a[ai]='w' or a[ai]='r' end
 				is_permutation: a.sequence.to_bag = a.sequence.old_.to_bag
 				b_in_range: 1 <= b and b <= i and b <= r + 1
 				i_in_range: 1 <= i and i <= r + 1
 				r_in_range: 0 <= r and r <= a.count
-				blue_first: across 1 |..| (b-1) as ai all a.sequence[ai.item] = 'b' end
-				white_second: across b |..| (i-1) as ai all a.sequence[ai.item] = 'w' end
-				red_last: across (r+1) |..| a.count as ai all a.sequence[ai.item] = 'r' end
+				blue_first: across 1 |..| (b-1) as ai all a.sequence[ai] = 'b' end
+				white_second: across b |..| (i-1) as ai all a.sequence[ai] = 'w' end
+				red_last: across (r+1) |..| a.count as ai all a.sequence[ai] = 'r' end
 			until
 				i > r
 			loop
@@ -50,10 +49,11 @@ feature -- Flag sort
 			end
 			Result := [b, r]
 		ensure
+			modify (a)
 			blue_before_red: Result.b <= Result.r + 1
-			blue_first: across 1 |..| (Result.b-1) as ai all a.sequence[ai.item] = 'b' end
-			white_second: across Result.b |..| Result.r as ai all a.sequence[ai.item] = 'w' end
-			red_last: across (Result.r+1) |..| a.count as ai all a.sequence[ai.item] = 'r' end
+			blue_first: across 1 |..| (Result.b-1) as ai all a.sequence[ai] = 'b' end
+			white_second: across Result.b |..| Result.r as ai all a.sequence[ai] = 'w' end
+			red_last: across (Result.r+1) |..| a.count as ai all a.sequence[ai] = 'r' end
 			is_permutation: a.sequence.to_bag = old a.sequence.to_bag
 		end
 
@@ -69,7 +69,6 @@ feature -- Three way partition
 			upper_bounds: upper <= a.count
 			no_overflow: a.count < {INTEGER}.max_value - 1
 
-			modify (a)
 		local
 			i, j, k: INTEGER
 		do
@@ -83,9 +82,9 @@ feature -- Three way partition
 				lower <= j and j <= k + 1
 				j - 1 <= k and k <= upper
 
-				across lower |..| (i-1) as ai all a.sequence[ai.item] < pivot end
-				across i |..| (j-1) as ai all a.sequence[ai.item] = pivot end
-				across (k+1) |..| upper as ai all a.sequence[ai.item] > pivot end
+				across lower |..| (i-1) as ai all a.sequence[ai] < pivot end
+				across i |..| (j-1) as ai all a.sequence[ai] = pivot end
+				across (k+1) |..| upper as ai all a.sequence[ai] > pivot end
 
 				is_permutation (a.sequence, a.sequence.old_)
 				a.sequence.front (lower - 1) ~ a.sequence.old_.front (lower - 1)
@@ -106,13 +105,14 @@ feature -- Three way partition
 			end
 			Result := [i - 1, k + 1]
 		ensure
+			modify (a)
 			left_bounds: lower - 1 <= Result.left and Result.left <= upper
 			right_bounds: lower <= Result.right and Result.right <= upper + 1
 			left_right_relation: Result.left <= Result.right + 1
 
-			smaller_left: across lower |..| Result.left as ai all a.sequence[ai.item] < pivot end
-			pivots_middle: across (Result.left+1) |..| (Result.right-1) as ai all a.sequence[ai.item] = pivot end
-			larger_right: across Result.right |..| upper as ai all a.sequence[ai.item] > pivot end
+			smaller_left: across lower |..| Result.left as ai all a.sequence[ai] < pivot end
+			pivots_middle: across (Result.left+1) |..| (Result.right-1) as ai all a.sequence[ai] = pivot end
+			larger_right: across Result.right |..| upper as ai all a.sequence[ai] > pivot end
 
 			permutation: is_permutation (a.sequence, old a.sequence)
 			unchanged_left: a.sequence.front (lower - 1) ~ old a.sequence.front (lower - 1)
@@ -129,7 +129,6 @@ feature -- Helper
 			i_in_range: 1 <= i and i <= a.count
 			j_in_range: 1 <= j and j <= a.count
 
-			modify (a)
 		local
 			t: CHARACTER
 		do
@@ -137,6 +136,7 @@ feature -- Helper
 			a[i] := a[j]
 			a[j] := t
 		ensure
+			modify (a)
 			swapped: a.sequence = (old a.sequence).replaced_at (i, (old a.sequence[j])).replaced_at (j, (old a.sequence[i]))
 			is_permutation: a.sequence.to_bag = old a.sequence.to_bag
 		end
@@ -149,7 +149,6 @@ feature -- Helper
 			i_in_range: 1 <= i and i <= a.count
 			j_in_range: 1 <= j and j <= a.count
 
-			modify (a)
 		local
 			t: INTEGER
 		do
@@ -157,6 +156,7 @@ feature -- Helper
 			a[i] := a[j]
 			a[j] := t
 		ensure
+			modify (a)
 			swapped: a.sequence ~ old (a.sequence.replaced_at (i, a.sequence[j]).replaced_at (j, a.sequence[i]))
 			is_permutation: a.sequence.to_bag ~ old a.sequence.to_bag
 		end

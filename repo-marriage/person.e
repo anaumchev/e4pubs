@@ -34,20 +34,20 @@ feature -- Basic operations
 			other_not_married: a_other.spouse = Void
 			current_not_married: spouse = Void
 
-			modify (Current, a_other)
 		do
 			a_other.unwrap
 
 			spouse := a_other
 			a_other.set_spouse (Current)
 
-			set_subjects ([spouse])
-			set_observers ([spouse])
-			a_other.set_subjects ([Current])
-			a_other.set_observers ([Current])
+			set_subjects (create {MML_SET [ANY]} & spouse)
+			set_observers (create {MML_SET [ANY]} & spouse)
+			a_other.set_subjects (create {MML_SET [ANY]} & Current)
+			a_other.set_observers (create {MML_SET [ANY]} & Current)
 
 			a_other.wrap
 		ensure
+			modify (Current, a_other)
 			married_to_other: spouse = a_other
 			married_to_current: a_other.spouse = Current
 		end
@@ -58,20 +58,20 @@ feature -- Basic operations
 			married: spouse /= Void
 			spouse_wrapped: spouse.is_wrapped
 
-			modify (Current, spouse)
 		do
 			spouse.unwrap
 
 			spouse.set_spouse (Void)
 
-			spouse.set_subjects ([])
-			spouse.set_observers ([])
-			set_subjects ([])
-			set_observers ([])
+			spouse.set_subjects (create {MML_SET [ANY]})
+			spouse.set_observers (create {MML_SET [ANY]})
+			set_subjects (create {MML_SET [ANY]})
+			set_observers (create {MML_SET [ANY]})
 
 			spouse.wrap
 			spouse := Void
 		ensure
+			modify (Current, spouse)
 			not_married: spouse = Void
 			old_spouse_not_married: (old spouse).spouse = Void
 			old_spouse_wrapped: (old spouse).is_wrapped
@@ -86,17 +86,17 @@ feature {PERSON} -- Implementation
 		require
 			person_not_current: a_person /= Current
 			open: is_open
-			observers_open: across observers as o all o.item.is_open end
+			observers_open: across observers as o all o.is_open end
 
-			modify_field ("spouse", Current)
 		do
 			spouse := a_person
 		ensure
+			modify_field ("spouse", Current)
 			spouse_set: spouse = a_person
 		end
 
 invariant
-	subjects_definition: if spouse = Void then subjects = [] else subjects = [spouse] end
+	subjects_definition: if spouse = Void then subjects.is_empty else subjects = create {MML_SET [ANY]} & spouse end
 	observers_definition: observers = subjects
 	not_married_to_self: spouse /= Current
 	marriage_symmetric: spouse /= Void implies spouse.spouse = Current

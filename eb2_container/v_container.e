@@ -42,8 +42,6 @@ feature -- Search
 			-- (Uses reference equality.)
 		note
 			status: impure, nonvariant
-		require
-			modify_model ("observers", Current)
 		local
 			it: V_ITERATOR [G]
 		do
@@ -52,6 +50,7 @@ feature -- Search
 			Result := not it.after
 			forget_iterator (it)
 		ensure
+			modify_model ("observers", Current)
 			definition: Result = bag.domain [v]
 			observers_restored: observers = old observers
 		end
@@ -61,8 +60,6 @@ feature -- Search
 			-- (Uses reference equality.)
 		note
 			status: impure, nonvariant
-		require
-			modify_model ("observers", Current)
 		local
 			it: V_ITERATOR [G]
 			s: MML_SEQUENCE [G]
@@ -88,6 +85,7 @@ feature -- Search
 			end
 			forget_iterator (it)
 		ensure
+			modify_model ("observers", Current)
 			definition: Result = bag [v]
 			observers_restored: observers ~ old observers
 		end
@@ -122,12 +120,12 @@ feature -- Specification
 			wrapped: is_wrapped
 			it_wrapped: it.is_wrapped
 			valid_target: it.target = Current
-			modify_field (["observers", "closed"], Current)
-			modify (it) -- not using modify_field here because of the typing bug
 		do
 			it.unwrap
 			set_observers (observers / it)
 		ensure
+			modify_field (["observers", "closed"], Current)
+			modify (it) -- not using modify_field here because of the typing bug
 			wrapped: is_wrapped
 			it_open: it.is_open
 			observer_removed: observers = old observers / it
@@ -144,12 +142,12 @@ feature {V_CONTAINER, V_ITERATOR} -- Specification
 		require
 			wrapped: is_wrapped
 			valid_type: attached {like new_cursor} it
-			modify_field (["observers", "closed"], Current)
 		do
 			unwrap
 			set_observers (observers & it)
 			wrap
 		ensure
+			modify_field (["observers", "closed"], Current)
 			wrapped: is_wrapped
 			observer_added: observers = old observers & it
 		end

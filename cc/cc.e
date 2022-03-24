@@ -19,7 +19,7 @@ feature
 		note
 			status: functional
 		do
-			Result := across s.domain as i all across s.domain as j all i.item < j.item implies s [i.item] < s[j.item] end end
+			Result := across s.domain as i all across s.domain as j all i < j implies s [i] < s[j] end end
 		end
 
 	outsider (s: MML_SEQUENCE [INTEGER]; i, x: INTEGER)
@@ -32,7 +32,7 @@ feature
 			outsider: i = s.count + 1 or else x < s [i]
 		do
 			if i /= s.count + 1 then
-				check across s.domain as j all i < j.item implies s [i] < s [j.item]  end end
+				check across s.domain as j all i < j implies s [i] < s [j] end end
 			end
 		ensure
 			s.tail (i).to_bag [x] = 0

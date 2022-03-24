@@ -15,10 +15,10 @@ feature -- Basic operations
 			explicit: wrapping, contracts
 		require
 			p_wrapped: p.is_wrapped
-			modify_field(["closed", "money"], p)
 		do
 			-- For a normal square do nothing.
 		ensure
+			modify_field(["closed", "money"], p)
 			p_wrapped: p.is_wrapped
 		end
 

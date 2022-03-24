@@ -20,9 +20,9 @@ feature
 			-- Execute command.
 		require
 			light.is_wrapped
-			modify (light)
 		deferred
 		ensure
+			modify (light)
 			light.is_wrapped
 		end
 

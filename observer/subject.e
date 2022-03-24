@@ -15,7 +15,7 @@ feature {NONE} -- Initialization
 		do
 			value := v
 			create subscribers.make
-			set_owns ([subscribers])
+			set_owns (create {MML_SET [ANY]} & subscribers)
 		ensure
 			value_set: value = v
 			no_subscribers: subscribers.is_empty
@@ -34,9 +34,7 @@ feature -- State update
 	update (v: INTEGER)
 			-- Update state to `v'.
 		require
-			observers_wrapped: across observers as o all o.item.is_wrapped end
-			modify_field (["value", "closed"], Current)
-			modify_field (["cache", "closed"], subscribers.sequence)
+			observers_wrapped: across observers as o all o.is_wrapped end
 		local
 			i: INTEGER
 		do
@@ -46,7 +44,7 @@ feature -- State update
 			from
 				i := 1
 			invariant
-				across 1 |..| (i - 1) as j all subscribers.sequence [j.item].inv end
+				across 1 |..| (i - 1) as j all subscribers.sequence [j].inv end
 				modify_field (["cache"], subscribers.sequence)
 			until
 				i > subscribers.count
@@ -57,7 +55,9 @@ feature -- State update
 
 			wrap_all (observers)
 		ensure
-			observers_wrapped: across observers as o all o.item.is_wrapped end
+			modify_field (["value", "closed"], Current)
+			modify_field (["cache", "closed"], subscribers.sequence)
+			observers_wrapped: across observers as o all o.is_wrapped end
 			value_set: value = v
 		end
 
@@ -79,7 +79,7 @@ feature {OBSERVER} -- Internal communication
 
 invariant
 	subscribers_exists: subscribers /= Void
-	owns_structure: owns = [subscribers]
+	owns_structure: owns = create {MML_SET [ANY]} & subscribers
 	all_subscribers_exist: subscribers.sequence.non_void
 	observers_structure: observers = subscribers.sequence.range
 

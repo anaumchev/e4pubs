@@ -14,7 +14,6 @@ feature
 		require
 			a.count >= 0
 
-			modify (a)
 		local
 			i, j: INTEGER
 			old_sequence: MML_SEQUENCE [BOOLEAN]
@@ -26,8 +25,8 @@ feature
 			invariant
 				a_wrapped: a.is_wrapped
 				i_and_j_bounds: i >= 0 and i <= j and j <= a.count
-				false_up_to_i: across 1 |..| i as ai all a.sequence[ai.item] = False end
-				true_from_j: across (j+1) |..| a.count as ai all a.sequence[ai.item] = True end
+				false_up_to_i: across 1 |..| i as ai all a.sequence[ai] = False end
+				true_from_j: across (j+1) |..| a.count as ai all a.sequence[ai] = True end
 				is_permutation: a.sequence.to_bag ~ old_sequence.to_bag
 			until
 				i = j
@@ -46,8 +45,9 @@ feature
 			end
 			Result := i
 		ensure
-			false_first: across 1 |..| Result as ai all a.sequence[ai.item] = False end
-			true_last: across (Result+1) |..| a.count as ai all a.sequence[ai.item] = True end
+			modify (a)
+			false_first: across 1 |..| Result as ai all a.sequence[ai] = False end
+			true_last: across (Result+1) |..| a.count as ai all a.sequence[ai] = True end
 			is_permutation: a.sequence.to_bag ~ old a.sequence.to_bag
 		end
 
@@ -59,7 +59,6 @@ feature
 			i_in_range: 1 <= i and i <= a.count
 			j_in_range: 1 <= j and j <= a.count
 
-			modify (a)
 		local
 			t: BOOLEAN
 		do
@@ -67,6 +66,7 @@ feature
 			a[i] := a[j]
 			a[j] := t
 		ensure
+			modify (a)
 			swapped: a.sequence = (old a.sequence).replaced_at (i, (old a.sequence[j])).replaced_at (j, (old a.sequence[i]))
 			is_permutation: a.sequence.to_bag = old a.sequence.to_bag
 		end

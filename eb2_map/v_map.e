@@ -98,9 +98,9 @@ feature -- Iteration
 		require
 			lock_wrapped: lock.is_wrapped
 			v_locked: lock.locked [k]
-			modify_field (["observers", "closed"], Current)
 		deferred
 		ensure
+			modify_field (["observers", "closed"], Current)
 			result_fresh: Result.is_fresh
 			result_wrapped: Result.is_wrapped and Result.inv
 			result_in_observers: observers = old observers & Result

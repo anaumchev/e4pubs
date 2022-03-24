@@ -25,14 +25,14 @@ feature -- Basic operations
 			valid_lock: s.lock = Current
 			valid_observers: s.observers [Current]
 			empty_set: s.set.is_empty
-			modify_field (["sets", "subjects", "closed"], Current)
-			modify_field ("owner", owns)
 		do
 			unwrap
 			sets := sets & s
 			set_subjects (subjects & s)
 			wrap
 		ensure
+			modify_field (["sets", "subjects", "closed"], Current)
+			modify_field ("owner", owns)
 			sets_effect: sets = old sets & s
 			wrapped: is_wrapped
 		end
@@ -45,13 +45,13 @@ feature -- Basic operations
 			wrapped: is_wrapped
 			item_wrapped: item.is_wrapped
 			item_not_set: not subjects [item]
-			modify_field (["owns", "closed"], Current)
-			modify_field ("owner", [item, owns])
 		do
 			unwrap
 			set_owns (owns & item)
 			wrap
 		ensure
+			modify_field (["owns", "closed"], Current)
+			modify_field ("owner", [item, owns])
 			owns_effect: owns = old owns & item
 			wrapped: is_wrapped
 		end
@@ -63,14 +63,14 @@ feature -- Basic operations
 		require
 			wrapped: is_wrapped
 			item_locked: owns [item]
-			not_in_set: across sets as s all not s.item.set [item] end
-			modify_field (["owns", "closed"], Current)
-			modify_field ("owner", [item, owns])
+			not_in_set: across sets as s all not s.set [item] end
 		do
 			unwrap
 			set_owns (owns / item)
 			wrap
 		ensure
+			modify_field (["owns", "closed"], Current)
+			modify_field ("owner", [item, owns])
 			owns_effect: owns = old owns / item
 			item_wrapped: item.is_wrapped
 			wrapped: is_wrapped
@@ -78,20 +78,20 @@ feature -- Basic operations
 
 invariant
 	subjects_definition: subjects = sets
-	subjects_lock: across sets as s all s.item.lock = Current end
+	subjects_lock: across sets as s all s.lock = Current end
 	owns_items: across sets as s all
-		across s.item.set as x all owns [x.item] end end
+		across s.set as x all owns [x] end end
 	no_owned_sets: subjects.is_disjoint (owns)
 	valid_buckets: across sets as s all
-		across s.item.set as x all
-			s.item.buckets.count > 0 and then
-			s.item.buckets [s.item.bucket_index (x.item.hash_code_, s.item.buckets.count)].has (x.item)
+		across s.set as x all
+			s.buckets.count > 0 and then
+			s.buckets [s.bucket_index (x.hash_code_, s.buckets.count)].has (x)
 			end end
 	no_duplicates: across sets as s all
-		across s.item.set as x all
-			across s.item.set as y all
-				x.item /= Void and y.item /= Void and then (x.item /= y.item implies not x.item.is_model_equal (y.item)) end end end
-	adm2: across sets as s all s.item.observers [Current] end
+		across s.set as x all
+			across s.set as y all
+				x /= Void and y /= Void and then (x /= y implies not x.is_model_equal (y)) end end end
+	adm2: across sets as s all s.observers [Current] end
 	no_observers: observers.is_empty
 
 end

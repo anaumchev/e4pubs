@@ -52,9 +52,9 @@ feature -- Extension
 			-- Add `v' to the dispenser.
 		require
 			no_observers: observers.is_empty
-			modify_model ("sequence", Current)
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			bag_effect: bag ~ old (bag & v)
 		end
 
@@ -65,9 +65,9 @@ feature -- Removal
 		require
 			not_empty: not is_empty
 			no_observers: observers.is_empty
-			modify_model ("sequence", Current)
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			wrapped: is_wrapped
 			sequence_effect: sequence ~ old sequence.but_first
 		end
@@ -76,9 +76,9 @@ feature -- Removal
 			-- Remove all elements.
 		require
 			no_observers: observers.is_empty
-			modify_model ("sequence", Current)
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			wrapped: is_wrapped
 			sequence_effect: sequence.is_empty
 		end

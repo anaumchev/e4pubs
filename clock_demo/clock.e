@@ -45,10 +45,10 @@ feature -- Element change
 			-- Set `hours' to `a_value'.
 		require
 			valid_hours: 0 <= a_value and a_value < 24
-			modify_model ("hours", Current)
 		do
 			hours := a_value
 		ensure
+			modify_model ("hours", Current)
 			hours_set: hours = a_value
 		end
 
@@ -56,10 +56,10 @@ feature -- Element change
 			-- Set `minutes' to `a_value'.
 		require
 			valid_minutes: 0 <= a_value and a_value < 60
-			modify_model ("minutes", Current)
 		do
 			minutes := a_value
 		ensure
+			modify_model ("minutes", Current)
 			minutes_set: minutes = a_value
 		end
 
@@ -67,10 +67,10 @@ feature -- Element change
 			-- Set `seconds' to `a_value'.
 		require
 			valid_seconds: 0 <= a_value and a_value < 60
-			modify_model ("seconds", Current)
 		do
 			seconds := a_value
 		ensure
+			modify_model ("seconds", Current)
 			seconds_set: seconds = a_value
 		end
 
@@ -80,8 +80,6 @@ feature -- Basic operations
 			-- Increase `hours' by one.
 		note
 			explicit: wrapping
-		require
-			modify_model ("hours", Current)
 		do
 			if hours = 23 then
 				set_hours (0)
@@ -89,6 +87,7 @@ feature -- Basic operations
 				set_hours (hours + 1)
 			end
 		ensure
+			modify_model ("hours", Current)
 			hours_increased: hours = (old hours + 1) \\ 24
 		end
 
@@ -96,8 +95,6 @@ feature -- Basic operations
 			-- Increase `minutes' by one.
 		note
 			explicit: wrapping
-		require
-			modify_model (["minutes", "hours"], Current)
 		do
 			if minutes = 59 then
 				set_minutes (0)
@@ -106,6 +103,7 @@ feature -- Basic operations
 				set_minutes (minutes + 2)
 			end
 		ensure
+			modify_model (["minutes", "hours"], Current)
 			hours_increased: old minutes = 59 implies hours = (old hours + 1) \\ 24
 			hours_unchanged: old minutes < 59 implies hours = old hours
 			minutes_increased: minutes = (old minutes + 1) \\ 60
@@ -115,8 +113,6 @@ feature -- Basic operations
 			-- Increase `seconds' by one.
 		note
 			explicit: wrapping
-		require
-			modify_model (["seconds", "minutes", "hours"], Current)
 		do
 			if seconds = 59 then
 				set_seconds (0)
@@ -125,6 +121,7 @@ feature -- Basic operations
 				set_seconds (seconds + 1)
 			end
 		ensure
+			modify_model (["seconds", "minutes", "hours"], Current)
 			hours_increased: old seconds = 59 and old minutes = 59 implies hours = (old hours + 1) \\ 24
 			hours_unchanged: old seconds < 59 or old minutes < 59 implies hours = old hours
 			minutes_increased: old seconds = 59 implies minutes = (old minutes + 1) \\ 60

@@ -25,15 +25,14 @@ feature {V_CONTAINER, V_ITERATOR} -- Initialization
 			-- Create iterator over `list'.
 		note
 			status: creator
-		require
-			modify (Current)
-			modify_field (["observers", "closed"], list)
 		do
 			target := list
 			target.add_iterator (Current)
 			check target.inv_only ("cells_domain", "bag_definition") end
 			target.lemma_cells_distinct
 		ensure
+			modify (Current)
+			modify_field (["observers", "closed"], list)
 			target_effect: target = list
 			index_effect: index_ = 0
 			list_observers_effect: list.observers = old list.observers & Current
@@ -45,7 +44,6 @@ feature {V_CONTAINER, V_ITERATOR} -- Initialization
 			is_wrapped
 			list_closed: list.closed
 			has_observer: list.observers [Current]
-			modify_model (["target", "index_", "subjects", "sequence"], Current)
 		do
 			unwrap
 			target := list
@@ -56,6 +54,7 @@ feature {V_CONTAINER, V_ITERATOR} -- Initialization
 			target.lemma_cells_distinct
 			wrap
 		ensure
+			modify_model (["target", "index_", "subjects", "sequence"], Current)
 			is_wrapped
 			target_effect: target = list
 			index_effect: index_ = 0
@@ -71,8 +70,6 @@ feature -- Initialization
 		require
 			target_wrapped: target.is_wrapped
 			other_target_wrapped: other.target.is_wrapped
-			modify (Current)
-			modify_model ("observers", [target, other.target])
 		do
 			if Current /= other then
 				check other.inv_only ("index_constraint", "after_definition", "sequence_definition", "cell_off", "cell_not_off", "default_owns") end
@@ -89,6 +86,8 @@ feature -- Initialization
 				wrap
 			end
 		ensure
+			modify (Current)
+			modify_model ("observers", [target, other.target])
 			target_effect: target = other.target
 			index_effect: index_ = other.index_
 			old_target_wrapped: (old target).is_wrapped
@@ -221,7 +220,7 @@ feature -- Cursor movement
 				invariant
 					1 <= index_ and index_ < index_.old_
 					inv_only ("cell_not_off", "after_definition", "default_owns")
-					across 1 |..| index_ as i all target.cells [i.item] /= old_active end
+					across 1 |..| index_ as i all target.cells [i] /= old_active end
 					is_wrapped
 				until
 					active.right = old_active
@@ -337,7 +336,7 @@ feature -- Extension
 				other.is_wrapped
 				target.is_wrapped
 				target /= Current
-				across target.observers as o all o.item /= Current implies o.item.is_open end
+				across target.observers as o all o /= Current implies o.is_open end
 				s = other.sequence.old_.interval (other.index_.old_, other.index_ - 1)
 				target.sequence ~ (target.sequence.front (index_.old_).old_ +
 					s + target.sequence.tail (index_.old_ + 1).old_)
@@ -366,15 +365,15 @@ feature -- Extension
 			other_wrapped: other.is_wrapped
 			other_not_target: other /= target
 			not_after: index_ <= sequence.count
-			observers_open: across target.observers as o all o.item /= Current implies o.item.is_open end
-			other_observers_open: across other.observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
-			modify_model ("sequence", [target, other])
+			observers_open: across target.observers as o all o /= Current implies o.is_open end
+			other_observers_open: across other.observers as o all o.is_open end
 		do
 			target.merge_after (other, active, index_)
 			check target.inv_only ("cells_domain", "bag_definition") end
 			target.lemma_cells_distinct
 		ensure
+			modify_model ("sequence", Current)
+			modify_model ("sequence", [target, other])
 			sequence_effect: sequence ~ old (sequence.front (index_) + other.sequence + sequence.tail (index_ + 1))
 			other_sequence_effect: other.sequence.is_empty
 		end
@@ -463,7 +462,6 @@ feature {V_ITERATOR} -- Implementation
 			wrapped: is_wrapped
 			target_closed: target.closed
 			c_in_list: target.cells.has (c)
-			modify_model ("index_", Current)
 		do
 			check target.inv end
 			unwrap
@@ -472,6 +470,7 @@ feature {V_ITERATOR} -- Implementation
 			index_ := target.cells.index_of (c)
 			wrap
 		ensure
+			modify_model ("index_", Current)
 			index_effect: target.cells [index_] = c
 			wrapped: is_wrapped
 		end

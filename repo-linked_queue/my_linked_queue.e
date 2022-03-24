@@ -83,7 +83,7 @@ feature -- Implementation
 
 invariant
 	list_not_void: list /= Void
-	owns_list: owns = [list]
+	owns_list: owns = create {MML_SET [ANY]} & list
 	sequence_definition: sequence = list.sequence
 
 end

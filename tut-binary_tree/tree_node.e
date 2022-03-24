@@ -25,22 +25,22 @@ feature {NONE} -- Initialization
 			-- Initialize node with `a_value' and children `a_left' and `a_right'.
 		note
 			status: creator
-            explicit: contracts
+      explicit: contracts
 		require
 			a_left.is_wrapped
 			a_right.is_wrapped
 
-            modify (Current)
-            modify_field ("owner", [a_left, a_right])
 		do
 			value := a_value
 			left := a_left
 			right := a_right
 		ensure
+      modify (Current)
+      modify_field ("owner", [a_left, a_right])
 			value_set: value = a_value
 			left_set: left = a_left
 			right_set: right = a_right
-            default_is_closed: is_wrapped
+      default_is_closed: is_wrapped
 		end
 
 feature -- Access
@@ -66,12 +66,12 @@ feature -- Element change
 			node_free: a_node.is_free
 			node_not_current: a_node /= Current
 
-			modify_field ("owner", a_node)
-			modify_field (["closed", "left", "owns", "sequence"], Current)
 		do
 			left := a_node
 			check right /= Void implies owns.has (right) end
 		ensure
+			modify_field ("owner", a_node)
+			modify_field (["closed", "left", "owns", "sequence"], Current)
 			default_is_wrapped: is_wrapped
 			left_set: left = a_node
 		end
@@ -86,12 +86,12 @@ feature -- Element change
 			node_free: a_node.is_free
 			node_not_current: a_node /= Current
 
-			modify_field ("owner", a_node)
-			modify_field (["closed", "right", "owns", "sequence"], Current)
 		do
 			right := a_node
 			check left /= Void implies owns.has (left) end
 		ensure
+			modify_field ("owner", a_node)
+			modify_field (["closed", "right", "owns", "sequence"], Current)
 			default_is_wrapped: is_wrapped
 			right_set: right = a_node
 		end
@@ -113,7 +113,7 @@ feature -- Basic operations
 				Result := Result.max (right.maximum)
 			end
 		ensure
-			max: across sequence.domain as i all sequence[i.item] <= Result end
+			max: across sequence.domain as i all sequence[i] <= Result end
 			exists: sequence.has (Result)
 		end
 
@@ -128,13 +128,13 @@ feature -- Model
 
 invariant
 
-	owns_definition: owns = {like owns}[[left, right]] / Void
+	owns_definition: owns = create {MML_SET [ANY]} & left & right / Void
 
 --	owns_definition_alt: owns =
 --		if left = Void then
 --			if right = Void then {like owns}[[]] else {like owns}[[right]] end
 --		else
---			if right = Void then {like owns}[[left]] else {like owns}[[left, right]] end
+--			if right = Void then create {MML_SET [ANY]} & left]] else {like owns}[[left & right end
 --		end
 
 	sequence_definition: sequence =

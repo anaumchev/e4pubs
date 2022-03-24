@@ -17,7 +17,7 @@ feature
 			create s
 
 			i := s.binary_search (a, 2)
-            check a.sequence.has (2) end
+      check a.sequence.has (2) end
 			check i = 5 end
 			check a[i] = 2 end
 
@@ -26,7 +26,7 @@ feature
 			check i = 0 end
 
 			i := s.binary_search (a, -5)
-            check a.sequence.has (-5) end
+      check a.sequence.has (-5) end
 			check i = 1 end
 			check a[i] = -5 end
 

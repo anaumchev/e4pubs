@@ -31,12 +31,12 @@ feature {NONE} -- Initialization
 			status: creator
 		require
 			l_wrapped: l.is_wrapped
-			modify (Current)
-			modify_model ("observers", l)
 		do
 			create table.make (l)
 			l.add_client (Current)
 		ensure then
+			modify (Current)
+			modify_model ("observers", l)
 			set_empty: set.is_empty
 			lock_set: lock = l
 			observers_empty: observers.is_empty
@@ -52,8 +52,6 @@ feature -- Initialization
 			lock_wrapped: lock.is_wrapped
 			same_lock: lock = other.lock
 			no_iterators: observers.is_empty
-			modify_model ("set", Current)
-			modify_model ("observers", [Current, other])
 		do
 			if other /= Current then
 				unwrap
@@ -63,6 +61,8 @@ feature -- Initialization
 				wrap
 			end
 		ensure
+			modify_model ("set", Current)
+			modify_model ("observers", [Current, other])
 			set_effect: set ~ old other.set
 			observers_restored: observers ~ old observers
 			other_observers_restored: other.observers ~ old other.observers
@@ -182,11 +182,11 @@ feature -- Specification
 
 invariant
 	table_exists: table /= Void
-	owns_definition: owns = [table]
+	owns_definition: owns = create {MML_SET [ANY]} & table
 	set_implementation: set = table.map.domain
-	table_values_definition: across set as x all table.map [x.item] = Void end
+	table_values_definition: across set as x all table.map [x] = Void end
 	same_lock: lock = table.lock
-	observers_type: across observers as o all attached {V_HASH_SET_ITERATOR [G]} o.item end
+	observers_type: across observers as o all attached {V_HASH_SET_ITERATOR [G]} o end
 	observers_correspond: table.observers.count <= observers.count
 
 note

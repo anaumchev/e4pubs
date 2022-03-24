@@ -13,7 +13,7 @@ feature {NONE} -- Initialization
 	make
 			-- Create a new account with balance of 0.
 		note
-			status: creator  -- Only verify `make' as constructor.
+			status: creator -- Only verify `make' as constructor.
 		do
 			balance := 0
 		ensure

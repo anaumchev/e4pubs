@@ -32,11 +32,10 @@ feature -- Element change
 
 	set_next (a_node: LINKED_NODE [G])
 			-- Set `next' to `a_node'.
-		require
-			modify_field (["next", "closed"], Current)
 		do
 			next := a_node
 		ensure
+			modify_field (["next", "closed"], Current)
 			next_set: next = a_node
 		end
 

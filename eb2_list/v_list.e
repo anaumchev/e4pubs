@@ -65,20 +65,20 @@ feature -- Extension
 	extend_front (v: G)
 			-- Insert `v' at the front.
 		require
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence ~ old sequence.prepended (v)
 		end
 
 	extend_back (v: G)
 			-- Insert `v' at the back.
 		require
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence ~ old (sequence & v)
 		end
 
@@ -86,10 +86,10 @@ feature -- Extension
 			-- Insert `v' at position `i'.
 		require
 			valid_index: 1 <= i and i <= sequence.count + 1
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence ~ old sequence.extended_at (i, v)
 		end
 
@@ -102,9 +102,7 @@ feature -- Extension
 			different_target: input.target /= Current
 			input_target_wrapped: input.target.is_wrapped
 			not_before: not input.before
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
-			modify_model ("index_", input)
+			observers_open: across observers as o all o.is_open end
 		do
 			from
 			invariant
@@ -122,6 +120,8 @@ feature -- Extension
 				input.sequence.count - input.index_
 			end
 		ensure
+			modify_model ("sequence", Current)
+			modify_model ("index_", input)
 			sequence_effect: sequence ~ old (sequence + input.sequence.tail (input.index_))
 			input_index_effect: input.index_ = input.sequence.count + 1
 		end
@@ -133,11 +133,11 @@ feature -- Extension
 			different_target: input.target /= Current
 			input_target_wrapped: input.target.is_wrapped
 			not_before: not input.before
-			observers_open: across observers as o all o.item.is_open end
-			modify_model (["sequence", "observers"], Current)
-			modify_model ("index_", input)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model (["sequence", "observers"], Current)
+			modify_model ("index_", input)
 			sequence_effect: sequence ~ old (input.sequence.tail (input.index_) + sequence)
 			input_index_effect: input.index_ = input.sequence.count + 1
 			observers_preserved: observers ~ old observers
@@ -151,11 +151,11 @@ feature -- Extension
 			different_target: input.target /= Current
 			input_target_wrapped: input.target.is_wrapped
 			not_before: not input.before
-			observers_open: across observers as o all o.item.is_open end
-			modify_model (["sequence", "observers"], Current)
-			modify_model ("index_", input)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model (["sequence", "observers"], Current)
+			modify_model ("index_", input)
 			sequence_effect: sequence ~ old (sequence.front (i - 1) + input.sequence.tail (input.index_) + sequence.tail (i))
 			input_index_effect: input.index_ = input.sequence.count + 1
 			observers_preserved: observers ~ old observers
@@ -167,10 +167,10 @@ feature -- Removal
 			-- Remove first element.
 		require
 			not_empty: not is_empty
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence ~ old sequence.but_first
 		end
 
@@ -178,10 +178,10 @@ feature -- Removal
 			-- Remove last element.
 		require
 			not_empty: not is_empty
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence ~ old sequence.but_last
 		end
 
@@ -189,10 +189,10 @@ feature -- Removal
 			-- Remove element at position `i'.
 		require
 			has_index: 1 <= i and i <= sequence.count
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence ~ old sequence.removed_at (i)
 		end
 
@@ -202,8 +202,7 @@ feature -- Removal
 			status: nonvariant
 		require
 			has: sequence.has (v)
-			observers_open: across observers as o all o.item.is_open end
-			modify_model (["sequence", "observers"], Current)
+			observers_open: across observers as o all o.is_open end
 		local
 			i: V_LIST_ITERATOR [G]
 		do
@@ -213,10 +212,11 @@ feature -- Removal
 			check i.inv_only ("target_bag_constraint", "sequence_definition") end
 			forget_iterator (i)
 		ensure
+			modify_model (["sequence", "observers"], Current)
 			sequence_effect: across 1 |..| sequence.count.old_ as j some
-					sequence.old_ [j.item] = v and
-					not sequence.old_.front (j.item - 1).has (v) and
-					sequence ~ sequence.old_.removed_at (j.item) end
+					sequence.old_ [j] = v and
+					not sequence.old_.front (j - 1).has (v) and
+					sequence ~ sequence.old_.removed_at (j) end
 			observers_restored: observers ~ old observers
 		end
 
@@ -225,8 +225,7 @@ feature -- Removal
 		note
 			status: nonvariant
 		require
-			observers_open: across observers as o all o.item.is_open end
-			modify_model (["sequence", "observers"], Current)
+			observers_open: across observers as o all o.is_open end
 		local
 			i: V_LIST_ITERATOR [G]
 			n_, j_: INTEGER
@@ -242,7 +241,7 @@ feature -- Removal
 				not sequence.front (i.index_ - 1).has (v)
 				sequence.count + n_ = sequence.old_.count
 				sequence.front (i.index_ - 1) = removed_all (sequence.old_.front (i.index_ + n_ - 1), v)
-				across i.index_ |..| sequence.count as j all sequence [j.item] = sequence.old_[j.item + n_] end
+				across i.index_ |..| sequence.count as j all sequence [j] = sequence.old_[j + n_] end
 				n_ >= 0
 				modify_model ("sequence", Current)
 				modify_model (["index_", "sequence"], i)
@@ -267,6 +266,7 @@ feature -- Removal
 			bag.old_.lemma_remove_all (v)
 			forget_iterator (i)
 		ensure
+			modify_model (["sequence", "observers"], Current)
 			sequence_effect: sequence ~ removed_all (old sequence, v)
 			observers_restored: observers ~ old observers
 		end
@@ -274,10 +274,10 @@ feature -- Removal
 	wipe_out
 			-- Remove all elements.
 		require
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
+			observers_open: across observers as o all o.is_open end
 		deferred
 		ensure
+			modify_model ("sequence", Current)
 			sequence_effect: sequence.is_empty
 		end
 

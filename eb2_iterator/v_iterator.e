@@ -114,9 +114,9 @@ feature -- Cursor movement
 			-- Go to the first position.
 		require
 			target_closed: target.closed
-			modify_model ("index_", Current)
 		deferred
 		ensure
+			modify_model ("index_", Current)
 			index_effect: index_ = 1
 			target_closed: target.closed
 		end
@@ -125,9 +125,9 @@ feature -- Cursor movement
 			-- Go to the last position.
 		require
 			target_closed: target.closed
-			modify_model ("index_", Current)
 		deferred
 		ensure
+			modify_model ("index_", Current)
 			index_effect: index_ = sequence.count
 			target_closed: target.closed
 		end
@@ -144,9 +144,9 @@ feature -- Cursor movement
 		require
 			not_off: not off
 			target_closed: target.closed
-			modify_model ("index_", Current)
 		deferred
 		ensure
+			modify_model ("index_", Current)
 			index_effect: index_ = old index_ - 1
 			target_closed: target.closed
 		end
@@ -158,7 +158,6 @@ feature -- Cursor movement
 		require
 			has_index: valid_index (i)
 			target_wrapped: target.is_wrapped
-			modify_model ("index_", Current)
 		local
 			j: INTEGER
 		do
@@ -187,15 +186,16 @@ feature -- Cursor movement
 				end
 			end
 		ensure
+			modify_model ("index_", Current)
 			index_effect: index_ = i
 		end
 
 	go_before
 			-- Go before any position of `target'.
 		require
-			modify_model ("index_", Current)
 		deferred
 		ensure
+			modify_model ("index_", Current)
 			index_effect: index_ = 0
 		end
 
@@ -203,9 +203,9 @@ feature -- Cursor movement
 			-- Go after any position of `target'.
 		require
 			target_closed: target.closed
-			modify_model ("index_", Current)
 		deferred
 		ensure
+			modify_model ("index_", Current)
 			index_effect: index_ = sequence.count + 1
 			target_closed: target.closed
 		end
@@ -228,7 +228,7 @@ feature -- Cursor movement
 				target.is_wrapped
 				index_.old_ <= index_ and index_ <= sequence.count + 1
 				not before
-				across index_.old_.max (1) |..| (index_ - 1) as i all sequence [i.item] /= v end
+				across index_.old_.max (1) |..| (index_ - 1) as i all sequence [i] /= v end
 			until
 				after or else item = v
 			loop
@@ -250,7 +250,6 @@ feature -- Cursor movement
 			status: nonvariant
 		require
 			target_wrapped: target.is_wrapped
-			modify_model ("index_", Current)
 		do
 			if after then
 				finish
@@ -263,7 +262,7 @@ feature -- Cursor movement
 				0 <= index_
 				index_ <= index_.old_
 				index_ <= sequence.count
-				across (index_ + 1) |..| index_.old_.min (sequence.count) as i all sequence [i.item] /= v end
+				across (index_ + 1) |..| index_.old_.min (sequence.count) as i all sequence [i] /= v end
 			until
 				before or else item = v
 			loop
@@ -272,6 +271,7 @@ feature -- Cursor movement
 				index_
 			end
 		ensure
+			modify_model ("index_", Current)
 			index_effect_not_found: not sequence.front (old index_).has (v) implies index_ = 0
 			index_effect_found: sequence.front (old index_).has (v) implies
 				(sequence [index_] = v and not sequence.interval (index_ + 1, old index_).has (v))
@@ -296,7 +296,7 @@ feature -- Specification
 
 invariant
 	target_exists: target /= Void
-	subjects_definition: subjects = [target]
+	subjects_definition: subjects = create {MML_SET [ANY]} & target
 	target_bag_constraint: target.bag ~ sequence.to_bag
 	index_constraint: 0 <= index_ and index_ <= sequence.count + 1
 	box_definition: box ~ if sequence.domain [index_] then create {MML_SET [G]}.singleton (sequence [index_]) else {MML_SET [G]}.empty_set end

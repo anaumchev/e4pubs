@@ -44,14 +44,11 @@ feature -- Modification
 		require
 			n_singleton: n.left = n
 			right_wrapped: right.is_wrapped
-			modify_field (["right", "closed", "subjects", "observers"], Current)
-			modify_field (["left", "closed", "subjects", "observers"], right)
-			modify (n)
 		local
 			r: DANCING
 		do
 			r := right
-			unwrap_all ([Current, r, n])
+			unwrap_all (create {MML_SET [ANY]} & Current & r & n)
 
 			n.set_right (r)
 			n.set_left (Current)
@@ -59,14 +56,17 @@ feature -- Modification
 			r.set_left (n)
 			set_right (n)
 
-			n.set_subjects ([r, Current])
-			n.set_observers ([r, Current])
-			set_subjects ([left, n])
-			set_observers ([left, n])
-			r.set_subjects ([n, r.right])
-			r.set_observers ([n, r.right])
-			wrap_all ([Current, r, n])
+			n.set_subjects (create {MML_SET [ANY]} & r & Current)
+			n.set_observers (create {MML_SET [ANY]} & r & Current)
+			set_subjects (create {MML_SET [ANY]} & left & n)
+			set_observers (create {MML_SET [ANY]} & left & n)
+			r.set_subjects (create {MML_SET [ANY]} & n & r.right)
+			r.set_observers (create {MML_SET [ANY]} & n & r.right)
+			wrap_all (create {MML_SET [ANY]} & Current & r & n)
 		ensure
+			modify_field (["right", "closed", "subjects", "observers"], Current)
+			modify_field (["left", "closed", "subjects", "observers"], right)
+			modify (n)
 			n_left_set: right = n
 			n_right_set: n.right = old right
 			old_right_wrapped: (old right).is_wrapped
@@ -80,24 +80,24 @@ feature -- Modification
 			wrapped: is_wrapped	-- Current is consistent (class invariant holds)
 			left_wrapped: left.is_wrapped -- left is consistent
 			right_wrapped: right.is_wrapped -- right is consistent
-			modify_field (["closed"], Current)
-			modify_field (["left", "closed", "subjects", "observers"], right)
-			modify_field (["right", "closed", "subjects", "observers"], left)
 		do
-			unwrap_all ([Current, left, right])	-- Ghost: open objects for modification
+			unwrap_all (create {MML_SET [ANY]} & Current & left & right)	-- Ghost: open objects for modification
 
 			left.set_right (right)	-- R[L[x]] := R[x]
 			right.set_left (left)	-- L[R[x]] := L[x]
 
-			left.set_subjects ([left.left, right])	-- Ghost: update subjects set
-			left.set_observers ([left.left, right])	-- Ghost: update observers set
-			right.set_subjects ([left, right.right])	-- Ghost: update subjects set
-			right.set_observers ([left, right.right])	-- Ghost: update observers set
+			left.set_subjects (create {MML_SET [ANY]} & left.left & right)	-- Ghost: update subjects set
+			left.set_observers (create {MML_SET [ANY]} & left.left & right)	-- Ghost: update observers set
+			right.set_subjects (create {MML_SET [ANY]} & left & right.right)	-- Ghost: update subjects set
+			right.set_observers (create {MML_SET [ANY]} & left & right.right)	-- Ghost: update observers set
 			if left /= Current then
 				check right /= Current end	-- Follows from the invariant
-				wrap_all ([left, right])	-- Ghost: close objects after checking their invariant
+				wrap_all (create {MML_SET [ANY]} & left & right)	-- Ghost: close objects after checking their invariant
 			end
 		ensure
+			modify_field (["closed"], Current)
+			modify_field (["left", "closed", "subjects", "observers"], right)
+			modify_field (["right", "closed", "subjects", "observers"], left)
 			open: is_open	-- Current remains detached from the rest of the list (invariant might not hold)
 			inv_without ("left_consistent", "right_consistent", "A2")	-- All invariant clauses except those listed hold
 			left_unchanged: left = old left
@@ -120,23 +120,23 @@ feature -- Modification
 			neighbors_connected: left.right = right
 			left_exists: left /= Void
 			right_exists: right /= Void
-			modify_field (["closed"], Current)
-			modify_field (["left", "closed", "subjects", "observers"], right)
-			modify_field (["right", "closed", "subjects", "observers"], left)
 		do
 			if left /= Current then
-				unwrap_all ([left, right])
+				unwrap_all (create {MML_SET [ANY]} & left & right)
 			end
 
 			left.set_right (Current)	-- R[L[x]] := x
 			right.set_left (Current)	-- L[R[x]] := x
 
-			left.set_subjects ([left.left, Current])
-			left.set_observers ([left.left, Current])
-			right.set_subjects ([Current, right.right])
-			right.set_observers ([Current, right.right])
-			wrap_all ([Current, left, right])
+			left.set_subjects (create {MML_SET [ANY]} & left.left & Current)
+			left.set_observers (create {MML_SET [ANY]} & left.left & Current)
+			right.set_subjects (create {MML_SET [ANY]} & Current & right.right)
+			right.set_observers (create {MML_SET [ANY]} & Current & right.right)
+			wrap_all (create {MML_SET [ANY]} & Current & left & right)
 		ensure
+			modify_field (["closed"], Current)
+			modify_field (["left", "closed", "subjects", "observers"], right)
+			modify_field (["right", "closed", "subjects", "observers"], left)
 			wrapped: is_wrapped		-- Current is back in the list (invariant holds)
 			left_wrapped: left.is_wrapped	-- Left is consistent
 			right_wrapped: right.is_wrapped	-- Right is consistent
@@ -151,10 +151,10 @@ feature {DANCING} -- Implementation
 		require
 			open: is_open
 			left_open: left.is_open
-			modify_field ("left", Current)
 		do
 			left := n -- preserves `right'
 		ensure
+			modify_field ("left", Current)
 			left = n
 		end
 
@@ -163,10 +163,10 @@ feature {DANCING} -- Implementation
 		require
 			open: is_open
 			right_open: right.is_open
-			modify_field ("right", Current)
 		do
 			right := n -- preserves `left'
 		ensure
+			modify_field ("right", Current)
 			right = n
 		end
 
@@ -191,8 +191,8 @@ feature -- Specification
 invariant
 	left_exists: left /= Void
 	right_exists: right /= Void
-	subjects_structure: subjects = [ left, right ] -- Objects the invariant depends on
-	observers_structure: observers = [ left, right ] -- Objects whose invariant can depend on Current
+	subjects_structure: subjects = create {MML_SET [ANY]} & left & right -- Objects the invariant depends on
+	observers_structure: observers = create {MML_SET [ANY]} & left & right -- Objects whose invariant can depend on Current
 	left_consistent: left.right = Current
 	right_consistent: right.left = Current
 

@@ -12,7 +12,7 @@ feature -- Basic operations
 		require
 			a_sorted: across 1 |..| a.sequence.count as i all
 						across 1 |..| a.sequence.count as j all
-							i.item <= j.item implies a.sequence[i.item] <= a.sequence[j.item] end end
+							i <= j implies a.sequence[i] <= a.sequence[j] end end
 		local
 			low, up, middle: INTEGER
 		do
@@ -22,8 +22,8 @@ feature -- Basic operations
 			invariant
 				low_and_up_range: 1 <= low and low <= up and up <= a.sequence.count + 1
 				result_range: Result = 0 or 1 <= Result and Result <= a.sequence.count
-				not_in_lower_part: across 1 |..| (low-1) as i all a.sequence[i.item] < value end
-				not_in_upper_part: across up |..| a.sequence.count as i all value < a.sequence[i.item] end
+				not_in_lower_part: across 1 |..| (low-1) as i all a.sequence[i] < value end
+				not_in_upper_part: across up |..| a.sequence.count as i all value < a.sequence[i] end
 				found: Result > 0 implies a.sequence[Result] = value
 			until
 				low >= up or Result > 0

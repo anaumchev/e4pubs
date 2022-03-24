@@ -6,9 +6,6 @@ class
 
 inherit
 	HS_HASHABLE
-		redefine
-			is_model_equal
-		end
 
 create
 	set_value

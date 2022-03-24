@@ -65,7 +65,7 @@ feature -- Test
 			s1.extend (i)
 			check s1.set.count = 2 end
 
-			create k.set_value (1)  	-- `k' is a duplicate of `i'...
+			create k.set_value (1) 	-- `k' is a duplicate of `i'...
 			lock.lock (k)
 			s1.extend (k)
 			check s1.set_has (k) end

@@ -45,10 +45,10 @@ feature -- Moving
 		require
 			not_beyond_start: n >= {BOARD}.Start_position - position
 
-			modify_field(["closed", "position"], Current)
 		do
 			position := position + n
 		ensure
+			modify_field(["closed", "position"], Current)
 			position_set: position = old position + n
 		end
 
@@ -56,11 +56,10 @@ feature -- Money
 
 	transfer (amount: INTEGER)
 			-- Add `amount' to `money'.
-		require
-			modify_field(["closed", "money"], Current)
 		do
 			money := (money + amount).max (0)
 		ensure
+			modify_field(["closed", "money"], Current)
 			money_set: money = (old money + amount).max (0)
 		end
 
@@ -74,8 +73,6 @@ feature -- Basic operations
 		require
 			board.is_wrapped
 
-			modify_field (["closed", "money", "position"], Current)
-			modify (d1, d2)
 		do
 			d1.roll
 			d2.roll
@@ -90,12 +87,15 @@ feature -- Basic operations
 			print (name + " rolled " + d1.face_value.out_ + " and " + d2.face_value.out_ +
 				". Moves to " + position.out_ +
 				". Now has " + money.out_ + " CHF.%N")
+		ensure
+			modify_field (["closed", "money", "position"], Current)
+			modify (d1, d2)
 		end
 
 invariant
 	position_not_negative: position >= 0
 	money_non_negative: money >= 0
-	owns_def: owns = [name]
+	owns_def: owns = create {MML_SET [ANY]} & name
 	name_not_void: name /= Void
 	name_exists: not name.sequence.is_empty
 	board_exists: board /= Void

@@ -22,11 +22,10 @@ feature -- Replacement
 
 	put (v: G)
 			-- Replace `item' with `v'.
-		require
-			modify_model ("item", Current)
 		do
 			item := v
 		ensure
+			modify_model ("item", Current)
 			item_effect: item = v
 		end
 

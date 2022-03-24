@@ -35,9 +35,6 @@ feature {NONE} -- Initialization
 			-- Create an iterator at position `i' in `list'.
 		note
 			status: creator
-		require
-			modify (Current)
-			modify_field (["observers", "closed"], list)
 		do
 			target := list
 			target.add_iterator (Current)
@@ -50,6 +47,8 @@ feature {NONE} -- Initialization
 			end
 			check target.inv end
 		ensure
+			modify (Current)
+			modify_field (["observers", "closed"], list)
 			target_effect: target = list
 			index_effect_has: 1 <= i and i <= list.sequence.count implies index = i
 			index_effect_before: i < 1 implies index = 0
@@ -66,8 +65,6 @@ feature -- Initialization
 		require
 			target_wrapped: target.is_wrapped
 			other_target_wrapped: other.target.is_wrapped
-			modify (Current)
-			modify_model ("observers", [target, other.target])
 		do
 			check other.inv_only ("index_constraint", "sequence_definition", "default_owns", "index_definition") end
 			check inv_only ("no_observers", "subjects_definition", "A2", "default_owns") end
@@ -80,6 +77,8 @@ feature -- Initialization
 				wrap
 			end
 		ensure then
+			modify (Current)
+			modify_model ("observers", [target, other.target])
 			target_effect: target = other.target
 			index_effect: index_ = other.index_
 			old_target_wrapped: (old target).is_wrapped

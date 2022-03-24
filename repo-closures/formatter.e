@@ -10,10 +10,10 @@ feature
 			a_paragraph /= Void
 			not_left_aligned: not a_paragraph.is_left_aligned
 
-			modify (a_paragraph)
 		do
 			a_paragraph.align_left
 		ensure
+			modify (a_paragraph)
 			is_left_aligned: a_paragraph.is_left_aligned
 		end
 
@@ -25,10 +25,10 @@ feature
 			a_paragraph /= Void
 			left_aligned: a_paragraph.is_left_aligned
 
-			modify (a_paragraph)
 		do
 			a_paragraph.align_right
 		ensure
+			modify (a_paragraph)
 			not_is_left_aligned: not a_paragraph.is_left_aligned
 		end
 

@@ -14,7 +14,6 @@ feature
 		require
 			-- TODO: add preconditions
 
-			modify ([]) -- this function does not modify anything
 		local
 			x, y: INTEGER
 		do
@@ -36,8 +35,9 @@ feature
 			end
 			Result := x
 		ensure
+			modify ([]) -- this function does not modify anything
 			result_in_range: 1 <= Result and Result <= a.count
-			result_is_max: across 1 |..| a.count as i all a.sequence[i.item] <= a[Result] end
+			result_is_max: across 1 |..| a.count as i all a.sequence[i] <= a[Result] end
 		end
 
 end

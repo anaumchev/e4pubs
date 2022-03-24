@@ -31,25 +31,24 @@ feature -- Update
 
 	tick
 			-- Increment time.
-		require
-			modify_field (["time", "closed"], Current)
 		do
 			-- This update satisfies its guard and thus preserves the invariant of slave clocks:
 			time := time + 1
 		ensure
+			modify_field (["time", "closed"], Current)
 			time_increased: time > old time
 		end
 
 	reset
 			-- Reset time to zero.
 		require
-			observers_open: across observers as o all o.item.is_open end
-			modify_field (["time", "closed"], Current)
+			observers_open: across observers as o all o.is_open end
 		do
 			-- This update does not satisfy its guard,
 			-- so the method requires that the observers be open:
 			time := 0
 		ensure
+			modify_field (["time", "closed"], Current)
 			time_reset: time = 0
 		end
 

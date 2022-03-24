@@ -14,8 +14,6 @@ feature {NONE} -- Initialization
 			status: creator
 		require
 			target_exists: t /= Void
-			modify (Current)
-			modify_field (["observers", "closed"], t)
 		do
 			target := t
 			before := True
@@ -23,6 +21,8 @@ feature {NONE} -- Initialization
 			t.set_observers (t.observers & Current)
 			t.wrap
 		ensure
+			modify (Current)
+			modify_field (["observers", "closed"], t)
 			target_set: target = t
 			before: before and not after
 			observing_target: t.observers = old t.observers & Current
@@ -73,7 +73,7 @@ feature {NONE} -- Implementation
 
 invariant
 	target_exists: target /= Void
-	subjects_structure: subjects = [target]
+	subjects_structure: subjects = create {MML_SET [ANY]} & target
 	index_in_bounds: 0 <= index and index <= target.count + 1
 	before_definition: before = (index < 1)
 	after_definition: after = (index > target.count)

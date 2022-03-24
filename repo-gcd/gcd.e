@@ -80,7 +80,7 @@ feature -- Specification
 		ensure
 			valid_index: i <= Result and Result <= a_turn.count
 			correct_value: a_turn [Result] = val
-			first_correct_value: across i |..| (Result - 1) as k all a_turn [k.item] /= val end
+			first_correct_value: across i |..| (Result - 1) as k all a_turn [k] /= val end
 		end
 
 end

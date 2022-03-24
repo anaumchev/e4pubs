@@ -13,9 +13,8 @@ feature
 			status: impure -- This function is not used in contracts.
 		require
 			a_not_void: a /= Void
-			natural_numbers: across 1 |..| a.count as ai all a.sequence[ai.item] >= 0 end
+			natural_numbers: across 1 |..| a.count as ai all a.sequence[ai] >= 0 end
 
-			modify ([]) -- This function does not modify anything.
 		local
 			i: INTEGER
 			sum, max: INTEGER
@@ -36,6 +35,7 @@ feature
 			end
 			Result := [sum, max]
 		ensure
+			modify ([]) -- This function does not modify anything.
 			-- TODO: add postconditions
 		end
 

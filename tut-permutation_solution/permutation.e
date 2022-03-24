@@ -7,7 +7,7 @@ feature -- Potential permutation encodings
 		note
 			status: functional
 		do
-			Result := across a as i all b.has (i.item) end
+			Result := across a as i all b.has (i) end
 		end
 
 	is_permutation_2 (a, b: MML_SEQUENCE [INTEGER]): BOOLEAN
@@ -15,8 +15,8 @@ feature -- Potential permutation encodings
 		note
 			status: functional
 		do
-			Result := across a as i all b.has (i.item) end and
-						across b as i all a.has (i.item) end and
+			Result := across a as i all b.has (i) end and
+						across b as i all a.has (i) end and
 						a.count = b.count
 		end
 

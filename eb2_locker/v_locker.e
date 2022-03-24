@@ -29,14 +29,14 @@ feature -- Specification
 			reads_field ("lock", Current)
 			reads_field ("equivalence", lock)
 		do
-			Result := across s as x all across s as y all x.item /= y.item implies not lock.equivalence [x.item, y.item] end end
+			Result := across s as x all across s as y all x /= y implies not lock.equivalence [x, y] end end
 		end
 
 invariant
 	lock_exists: lock /= Void
 	locked_non_void: locked.non_void
 	lock_non_current: lock /= Current
-	subjects_definition: subjects = [lock]
+	subjects_definition: subjects = create {MML_SET [ANY]} & lock
 	items_locked: locked <= lock.locked
 	no_duplicates: no_duplicates (locked)
 

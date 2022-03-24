@@ -19,12 +19,12 @@ feature -- Algorithms
 			no_overflow: a.count < {INTEGER}.max_value
 			no_overflow: are_values_in_range (a.sequence, 1, a.count, {INTEGER}.min_value + 1, {INTEGER}.max_value - 1)
 
-			modify (a)
 		do
 			if a.count > 1 then
 				quick_sort_recursive_step (a, 1, a.count, {INTEGER}.min_value + 1, {INTEGER}.max_value - 1)
 			end
 		ensure
+			modify (a)
 			sorted: is_sorted (a.sequence)
 			permutation: is_permutation (a.sequence, old a.sequence)
 		end
@@ -40,7 +40,6 @@ feature -- Algorithms
 			value_bounds: are_values_in_range (a.sequence, lower, upper, min, max)
 			no_overflow: a.count < {INTEGER}.max_value and min > {INTEGER}.min_value and max < {INTEGER}.max_value
 
-			modify (a)
 			decreases (max - min)
 		local
 			pivot: INTEGER
@@ -54,6 +53,7 @@ feature -- Algorithms
 				quick_sort_recursive_step (a, partition.right, upper, pivot + 1, max)
 			end
 		ensure
+			modify (a)
 			finished: lower >= upper implies a.sequence ~ old a.sequence
 			sorted: is_part_sorted (a.sequence, lower, upper)
 			value_bounds: are_values_in_range (a.sequence, lower, upper, min, max)
@@ -72,7 +72,6 @@ feature -- Algorithms
 			a_not_empty: a.count > 0
 			no_overflow: a.count < {INTEGER}.max_value
 
-			modify (a)
 		local
 			i, j: INTEGER
 		do
@@ -108,6 +107,7 @@ feature -- Algorithms
 				i := i + 1
 			end
 		ensure
+			modify (a)
 			sorted: is_sorted (a.sequence)
 			permutation: is_permutation (a.sequence, old a.sequence)
 		end
@@ -121,7 +121,6 @@ feature -- Algorithms
 			a_not_empty: a.count > 0
 			no_overflow: a.count < {INTEGER}.max_value
 
-			modify (a)
 		local
 			i, j, m: INTEGER
 		do
@@ -147,8 +146,8 @@ feature -- Algorithms
 					is_part_sorted (a.sequence, 1, i)
 					is_area1_smaller_equal_area2 (a.sequence, 1, i-1, i, a.count)
 					is_permutation (a.sequence, a.sequence.old_)
-					across 1 |..| (i-1) as ai all a.sequence[ai.item] <= a.sequence[m] end
-					across i |..| (j-1) as ai all a.sequence[m] <= a.sequence[ai.item] end
+					across 1 |..| (i-1) as ai all a.sequence[ai] <= a.sequence[m] end
+					across i |..| (j-1) as ai all a.sequence[m] <= a.sequence[ai] end
 				until
 					j = a.count + 1
 				loop
@@ -161,6 +160,7 @@ feature -- Algorithms
 				i := i + 1
 			end
 		ensure
+			modify (a)
 			is_sorted: is_sorted (a.sequence)
 			is_permutation: is_permutation (a.sequence, old a.sequence)
 		end
@@ -174,7 +174,6 @@ feature -- Algorithms
 			a_not_empty: a.count > 0
 			no_overflow: a.count < {INTEGER}.max_value
 
-			modify (a)
 		local
 			i, j: INTEGER
 		do
@@ -199,7 +198,7 @@ feature -- Algorithms
 					is_part_sorted (a.sequence, i, a.count)
 					is_area1_smaller_equal_area2 (a.sequence, 1, i, i+1, a.count)
 					is_permutation (a.sequence, a.sequence.old_)
-					across 1 |..| j as ai all a.sequence[ai.item] <= a.sequence[j] end
+					across 1 |..| j as ai all a.sequence[ai] <= a.sequence[j] end
 				until
 					j = i
 				loop
@@ -211,6 +210,7 @@ feature -- Algorithms
 				i := i - 1
 			end
 		ensure
+			modify (a)
 			is_sorted: is_sorted (a.sequence)
 			is_permutation: is_permutation (a.sequence, old a.sequence)
 		end
@@ -224,7 +224,6 @@ feature -- Algorithms
 			a_not_empty: a.count > 0
 			no_overflow: a.count < {INTEGER}.max_value
 
-			modify (a)
 		local
 			pos: INTEGER
 		do
@@ -250,6 +249,7 @@ feature -- Algorithms
 				end
 			end
 		ensure
+			modify (a)
 			sorted: is_sorted (a.sequence)
 			permutation: is_permutation (a.sequence, old a.sequence)
 		end
@@ -263,7 +263,6 @@ feature -- Algorithms
 			a_not_empty: a.count > 0
 			no_overflow: a.count < {INTEGER}.max_value - 1
 
-			modify (a)
 		local
 			pos: INTEGER
 			last: INTEGER
@@ -305,6 +304,7 @@ feature -- Algorithms
 				end
 			end
 		ensure
+			modify (a)
 			sorted: is_sorted (a.sequence)
 			permutation: is_permutation (a.sequence, old a.sequence)
 		end
@@ -319,7 +319,6 @@ feature -- Helper
 			i_in_range: 1 <= i and i <= a.count
 			j_in_range: 1 <= j and j <= a.count
 
-			modify (a)
 		local
 			t: INTEGER
 		do
@@ -327,6 +326,7 @@ feature -- Helper
 			a[i] := a[j]
 			a[j] := t
 		ensure
+			modify (a)
 			swapped: a.sequence = (old a.sequence).replaced_at (i, (old a.sequence[j])).replaced_at (j, (old a.sequence[i]))
 			is_permutation: a.sequence.to_bag = old a.sequence.to_bag
 		end
@@ -341,7 +341,6 @@ feature -- Helper
 			pivot_bounds: min <= pivot and pivot <= max
 			value_bounds: are_values_in_range (a.sequence, lower, upper, min, max)
 
-			modify (a)
 		local
 			i, j, k: INTEGER
 		do
@@ -380,6 +379,7 @@ feature -- Helper
 			end
 			Result := [i - 1, k + 1]
 		ensure
+			modify (a)
 			left_bounds: lower - 1 <= Result.left and Result.left <= upper
 			right_bounds: lower <= Result.right and Result.right <= upper + 1
 			left_right_relation: Result.left < Result.right
@@ -413,7 +413,7 @@ feature -- Specification
 		do
 			Result := across lower |..| upper as i all
 						across lower |..| upper as j all
-							i.item <= j.item implies s[i.item] <= s[j.item] end end
+							i <= j implies s[i] <= s[j] end end
 		end
 
 	is_area1_smaller_equal_area2 (s: MML_SEQUENCE [INTEGER]; lower_a1, upper_a1, lower_a2, upper_a2: INTEGER): BOOLEAN
@@ -426,7 +426,7 @@ feature -- Specification
 		do
 			Result := across lower_a1 |..| upper_a1 as i all
 						across lower_a2 |..| upper_a2 as j all
-							s[i.item] <= s[j.item] end end
+							s[i] <= s[j] end end
 		end
 
 	is_permutation (s1, s2: MML_SEQUENCE [INTEGER]): BOOLEAN
@@ -445,7 +445,7 @@ feature -- Specification
 			same_size: s1.count = s2.count
 			lower_upper_bounds: 1 <= lower and upper <= s1.count
 		do
-			Result := across lower |..| (upper) as i all s1[i.item] = s2[i.item] end
+			Result := across lower |..| (upper) as i all s1[i] = s2[i] end
 		end
 
 	are_values_in_range (s: MML_SEQUENCE [INTEGER]; lower, upper, min, max: INTEGER): BOOLEAN
@@ -456,7 +456,7 @@ feature -- Specification
 			lower_upper_bounds: 1 <= lower and upper <= s.count
 			min_lower_relation: min <= max + 1
 		do
-			Result := across lower |..| (upper) as i all min <= s[i.item] and s[i.item] <= max end
+			Result := across lower |..| (upper) as i all min <= s[i] and s[i] <= max end
 		end
 
 end

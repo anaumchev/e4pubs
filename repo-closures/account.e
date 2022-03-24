@@ -50,11 +50,11 @@ feature -- Element change
 			amount_not_negative: amount >= 0
 			amount_not_too_large: amount <= balance
 
-			modify (Current, other)
 		do
 			withdraw (amount)
 			other.deposit (amount)
 		ensure
+			modify (Current, other)
 			balance_decreased: balance = old balance - amount
 			other_balance_increased: other.balance = old other.balance + amount
 		end

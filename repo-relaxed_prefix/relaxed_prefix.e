@@ -27,9 +27,9 @@ feature
 					shift_two: (shift = 2) = (1 <= Result.idx1 and Result.idx1 < Result.idx2 and Result.idx2 < i)
 					shift_result: (shift = 2) = (not Result.res)
 
-					match_up_to_idx1: across 1 |..| (Result.idx1 - 1) as k all pat [k.item] = a [k.item] end
-					no_shift_match: shift = 0 implies across 1 |..| (i - 1) as k all pat [k.item] = a [k.item] end
-					one_shift_match: shift = 1 implies across (Result.idx1 + 1) |..| (i - 1) as k all pat [k.item] = a [k.item - 1] end
+					match_up_to_idx1: across 1 |..| (Result.idx1 - 1) as k all pat [k] = a [k] end
+					no_shift_match: shift = 0 implies across 1 |..| (i - 1) as k all pat [k] = a [k] end
+					one_shift_match: shift = 1 implies across (Result.idx1 + 1) |..| (i - 1) as k all pat [k] = a [k - 1] end
 					first_mismatch: shift >= 1 implies (Result.idx1 > a.count or else pat [Result.idx1] /= a [Result.idx1])
 					second_mismatch: shift = 2 implies (Result.idx2 > a.count or else pat [Result.idx2] /= a [Result.idx2 - 1])
 				until
@@ -58,11 +58,11 @@ feature
 				end
 			end
 		ensure
-			strict_prefix: Result.res and Result.idx1 = 0 implies across 1 |..| pat.count as k all pat [k.item] = a [k.item] end
+			strict_prefix: Result.res and Result.idx1 = 0 implies across 1 |..| pat.count as k all pat [k] = a [k] end
 			relaxed_prefix: Result.res and 1 <= Result.idx1 implies
 					Result.idx1 <= pat.count and then
-					across 1 |..| (Result.idx1 - 1) as k all pat [k.item] = a [k.item] end and then
-					across (Result.idx1 + 1) |..| pat.count as k all pat [k.item] = a [k.item - 1] end
+					across 1 |..| (Result.idx1 - 1) as k all pat [k] = a [k] end and then
+					across (Result.idx1 + 1) |..| pat.count as k all pat [k] = a [k - 1] end
 			not_a_prefix: not Result.res implies
 					1 <= Result.idx1 and Result.idx1 < Result.idx2 and Result.idx2 <= pat.count and -- both `idx1' and `idx2' are within `pat'
 					((Result.idx1 > a.count) or else -- either `a' is two too short

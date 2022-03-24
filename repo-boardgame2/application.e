@@ -29,7 +29,7 @@ feature
 
 			create game.make (count)
 			game.play
-			check across game.winners.sequence as o all o.item.closed end end
+			check across game.winners.sequence as o all o.closed end end
 			if game.winners.count = 1 then
 				print ("%NAnd the winner is: " + game.winners [1].name)
 			else

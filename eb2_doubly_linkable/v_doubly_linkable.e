@@ -40,14 +40,14 @@ feature -- Replacement
 			cell_wrapped: cell.is_wrapped
 			segment_end: right = Void
 			segment_start: cell.left = Void
-			modify_model (["right", "subjects", "observers"], Current)
-			modify_model (["left", "subjects", "observers"], cell)
 		do
 			cell.unwrap
 			put_right (cell)
 			cell.put_left (Current)
 			cell.wrap
 		ensure
+			modify_model (["right", "subjects", "observers"], Current)
+			modify_model (["left", "subjects", "observers"], cell)
 			wrapped: is_wrapped
 			cell_wrapped: cell.is_wrapped
 			connected: right = cell
@@ -64,16 +64,16 @@ feature -- Replacement
 			right_wrapped: right.is_wrapped
 			segment_start: front.left = Void
 			segment_end: back.right = Void
-			modify_model (["right", "subjects", "observers"], [Current, back])
-			modify_model (["left", "subjects", "observers"], [right, front])
 		do
-			unwrap_all ([Current, right, front, back])
+			unwrap_all (create {MML_SET [ANY]} & Current & right & front & back)
 			back.put_right (right)
 			right.put_left (back)
 			put_right (front)
 			front.put_left (Current)
-			wrap_all ([Current, back.right, front, back])
+			wrap_all (create {MML_SET [ANY]} & Current & back.right & front & back)
 		ensure
+			modify_model (["right", "subjects", "observers"], [Current, back])
+			modify_model (["left", "subjects", "observers"], [right, front])
 			front_connected: right = front
 			back_connected: back.right = old right
 			wrapped: is_wrapped
@@ -90,15 +90,15 @@ feature -- Replacement
 			wrapped: is_wrapped
 			right_wrapped: right.is_wrapped
 			next_wrapped: right.right.is_wrapped
+		do
+			unwrap_all (create {MML_SET [ANY]} & Current & right & right.right)
+			put_right (right.right)
+			right.put_left (Current)
+			wrap_all (create {MML_SET [ANY]} & Current & right)
+		ensure
 			modify_model (["right", "subjects", "observers"], Current)
 			modify_model (["left", "subjects", "observers"], right.right)
 			modify (right)
-		do
-			unwrap_all ([Current, right, right.right])
-			put_right (right.right)
-			right.put_left (Current)
-			wrap_all ([Current, right])
-		ensure
 			right_set: right = old right.right
 			wrapped: is_wrapped
 			right_wrapped: right.is_wrapped
@@ -112,12 +112,12 @@ feature {V_DOUBLY_LINKABLE, V_DOUBLY_LINKED_LIST} -- Replacement
 			open: is_open
 			right_open: right = Void or else right.is_open
 			inv_only ("subjects_definition", "observers_definition")
-			modify_field (["right", "subjects", "observers"], Current)
 		do
 			right := cell
 			set_subjects (([left, right]).to_mml_set / Void)
 			set_observers (subjects)
 		ensure
+			modify_field (["right", "subjects", "observers"], Current)
 			right_effect: right = cell
 			inv_only ("subjects_definition", "observers_definition")
 		end
@@ -128,12 +128,12 @@ feature {V_DOUBLY_LINKABLE, V_DOUBLY_LINKED_LIST} -- Replacement
 			open: is_open
 			left_open: left = Void or else left.is_open
 			inv_only ("subjects_definition", "observers_definition")
-			modify_field (["left", "subjects", "observers"], Current)
 		do
 			left := cell
 			set_subjects (([left, right]).to_mml_set / Void)
 			set_observers (subjects)
 		ensure
+			modify_field (["left", "subjects", "observers"], Current)
 			left_effect: left = cell
 			inv_only ("subjects_definition", "observers_definition")
 		end

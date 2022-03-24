@@ -111,8 +111,6 @@ feature -- Search
 			-- out of range, if `v' does not occur.			
 		note
 			status: impure, nonvariant
-		require
-			modify_model (["observers"], Current)
 		do
 			check inv end
 			if not is_empty then
@@ -122,6 +120,7 @@ feature -- Search
 			end
 			check inv end
 		ensure
+			modify_model (["observers"], Current)
 			definition_not_has: not sequence.has (v) implies Result = upper_ + 1
 			definition_has: sequence.has (v) implies lower_ <= Result and Result <= upper_ and then sequence [idx (Result)] = v
 			constraint: not sequence.front (idx (Result - 1)).has (v)
@@ -135,7 +134,6 @@ feature -- Search
 			status: impure, nonvariant
 		require
 			has_index: has_index (i)
-			modify_model (["observers"], Current)
 		local
 			it: V_SEQUENCE_ITERATOR [G]
 		do
@@ -148,6 +146,7 @@ feature -- Search
 			end
 			forget_iterator (it)
 		ensure
+			modify_model (["observers"], Current)
 			definition_not_has: not sequence.tail (idx (i)).has (v) implies Result = upper_ + 1
 			definition_has: sequence.tail (idx (i)).has (v) implies i <= Result and Result <= upper_ and then sequence [idx (Result)] = v
 			constraint: not sequence.interval (idx (i), idx (Result - 1)).has (v)
@@ -168,11 +167,10 @@ feature -- Iteration
 			-- New iterator pointing to the last position.
 		note
 			status: impure, nonvariant
-		require
-			modify_field (["observers", "closed"], Current)
 		do
 			Result := at (upper)
 		ensure
+			modify_field (["observers", "closed"], Current)
 			result_fresh: Result.is_fresh
 			result_wrapped: Result.is_wrapped and Result.inv
 			result_in_observers: observers = old observers & Result
@@ -186,9 +184,9 @@ feature -- Iteration
 		note
 			status: impure
 		require
-			modify_field (["observers", "closed"], Current)
 		deferred
 		ensure
+			modify_field (["observers", "closed"], Current)
 			result_fresh: Result.is_fresh
 			result_wrapped: Result.is_wrapped and Result.inv
 			result_in_observers: observers = old observers & Result

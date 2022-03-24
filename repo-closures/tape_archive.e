@@ -12,7 +12,7 @@ feature {NONE}
 		do
 			create tape
 			is_loaded := True
-			set_owns ([tape])
+			set_owns (create {MML_SET [ANY]} & tape)
 		ensure
 			tape_created: tape /= Void
 			loaded: is_loaded
@@ -33,7 +33,7 @@ feature -- Basic operations
 		do
 			tape := Void
 			is_loaded := False
-			set_owns ([])
+			set_owns (create {MML_SET [ANY]})
 		ensure
 			tape_ejected: tape = Void
 			not_loaded: not is_loaded
@@ -50,7 +50,7 @@ feature -- Basic operations
 		end
 
 invariant
-	owns_def: is_loaded implies owns = [tape]
+	owns_def: is_loaded implies owns = create {MML_SET [ANY]} & tape
 	loaded: is_loaded implies tape /= Void
 
 end

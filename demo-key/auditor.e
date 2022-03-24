@@ -10,8 +10,6 @@ feature -- Operations
 	audit (an_account: ACCOUNT_OWNERSHIP)
 		note
 			explicit: wrapping
-		require
-			modify (an_account)
 		local
 			transactions: SIMPLE_LIST [INTEGER]
 		do
@@ -22,6 +20,7 @@ feature -- Operations
 				-- stability is enforced.
 			transactions.extend_front (0)
 		ensure
+			modify (an_account)
 			account_valid: an_account.is_wrapped
 		end
 
@@ -30,13 +29,13 @@ feature -- Operations
 			explicit: "all"
 		require
 			an_account.is_wrapped
-			modify (an_account)
 		local
 			transactions: SIMPLE_LIST [INTEGER]
 		do
 			transactions := an_account.leak_transactions_unsafe
 			transactions.extend_front (0)
 		ensure
+			modify (an_account)
 			account_invalid: an_account.is_open
 		end
 

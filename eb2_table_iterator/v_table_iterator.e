@@ -27,11 +27,11 @@ feature -- Replacement
 			not_off: not off
 			target_wrapped: target.is_wrapped
 			lock_wrapped: target.lock.is_wrapped
-			only_iterator: target.observers = [Current]
-			modify_model (["value_sequence", "box"], Current)
-			modify_model ("map", target)
+			only_iterator: target.observers = create {MML_SET [ANY]} & Current
 		deferred
 		ensure
+			modify_model (["value_sequence", "box"], Current)
+			modify_model ("map", target)
 			target_map_effect: target.map ~ old target.map.updated (sequence [index_], v)
 			target_wrapped: target.is_wrapped
 		end
@@ -44,11 +44,11 @@ feature -- Removal
 			not_off: not off
 			target_wrapped: target.is_wrapped
 			lock_wrapped: target.lock.is_wrapped
-			only_iterator: target.observers = [Current]
-			modify_model (["sequence", "box"], Current)
-			modify_model ("map", target)
+			only_iterator: target.observers = create {MML_SET [ANY]} & Current
 		deferred
 		ensure
+			modify_model (["sequence", "box"], Current)
+			modify_model ("map", target)
 			sequence_effect: sequence ~ old sequence.removed_at (index_)
 			target_map_effect: target.map ~ old target.map.removed (sequence [index_])
 			target_wrapped: target.is_wrapped

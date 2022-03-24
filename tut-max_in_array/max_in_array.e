@@ -18,8 +18,8 @@ feature -- Basic operations
 				i := 2
 			invariant
 				i_in_bounds: 2 <= i and i <= a.sequence.count + 1
-				max_so_far: across 1 |..| (i-1) as c all a.sequence[c.item] <= Result end
-				result_in_array: across 1 |..| (i-1) as c some a.sequence[c.item] = Result end
+				max_so_far: across 1 |..| (i-1) as c all a.sequence[c] <= Result end
+				result_in_array: across 1 |..| (i-1) as c some a.sequence[c] = Result end
 			until
 				i > a.count
 			loop
@@ -31,8 +31,8 @@ feature -- Basic operations
 				a.count - i
 			end
 		ensure
-			is_maximum: across 1 |..| a.count as c all a.sequence[c.item] <= Result end
-			result_in_array: across 1 |..| a.count as c some a.sequence[c.item] = Result end
+			is_maximum: across 1 |..| a.count as c all a.sequence[c] <= Result end
+			result_in_array: across 1 |..| a.count as c some a.sequence[c] = Result end
 		end
 
 end

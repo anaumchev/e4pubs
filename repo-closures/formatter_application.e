@@ -11,13 +11,13 @@ feature -- Basic operations
 			a_paragraph /= Void
 			not a_paragraph.is_left_aligned
 
-			modify (a_paragraph)
 		local
-			l_agent: PROCEDURE [FORMATTER, TUPLE [PARAGRAPH]]
+			l_agent: PROCEDURE [PARAGRAPH]
 		do
 			l_agent := agent a_formatter.align_left
 			a_paragraph.format (l_agent)
 		ensure
+			modify (a_paragraph)
 			a_paragraph.is_left_aligned
 		end
 
@@ -30,13 +30,13 @@ feature -- Basic operations
 			a_paragraph /= Void
 			a_paragraph.is_left_aligned
 
-			modify (a_paragraph)
 		local
-			l_agent: PROCEDURE [FORMATTER, TUPLE [PARAGRAPH]]
+			l_agent: PROCEDURE [PARAGRAPH]
 		do
 			l_agent := agent a_formatter.align_right
 			a_paragraph.format (l_agent)
 		ensure
+			modify (a_paragraph)
 			not a_paragraph.is_left_aligned
 		end
 

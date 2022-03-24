@@ -11,13 +11,14 @@ feature
 			data.is_wrapped
 			c /= data
 
-			modify (c)
 		local
 			archive: TAPE_ARCHIVE
 		do
 			create archive.make
 --			archive.eject -- comment out to see precondition violation
 			c.log (agent archive.store, data)
+		ensure
+			modify (c)
 		end
 
 end

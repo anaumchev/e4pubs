@@ -27,20 +27,20 @@ feature {NONE} -- Initialization
 			invariant
 				players.is_fully_writable and players.is_wrapped
 				players.inv_only ("lower_definition", "upper_definition")
-				players.lower = 1 and players.upper = n and players.observers = []
+				players.lower = 1 and players.upper = n and players.observers.is_empty
 				board.inv_only ("squares_exists", "squares_bounds")
 
-				1 <=  i and i <= players.count + 1
+				1 <= i and i <= players.count + 1
 				across 1 |..| (i-1) as k all
-					players.sequence[k.item].is_wrapped and
-					players.sequence[k.item].is_fresh and
-					players.sequence[k.item].position = board.squares.lower and
-					players.sequence[k.item].money = Initial_money and
-					players.sequence[k.item].board = board
+					players.sequence[k].is_wrapped and
+					players.sequence[k].is_fresh and
+					players.sequence[k].position = board.squares.lower and
+					players.sequence[k].money = Initial_money and
+					players.sequence[k].board = board
 				end
 				across 1 |..| (i-1) as j all
 					across 1 |..| (i-1) as k all
-						j.item /= k.item implies players.sequence[j.item] /= players.sequence[k.item] end end
+						j /= k implies players.sequence[j] /= players.sequence[k] end end
 
 				modify (players)
 			until
@@ -58,8 +58,8 @@ feature {NONE} -- Initialization
 			create {V_LINKED_LIST [PLAYER]} winners
 		ensure
 			not_yet_playerd: winners.sequence.is_empty
-			fair_start: across players.sequence as o all o.item.position = board.squares.lower end
-			fair_money: across players.sequence as o all o.item.money = Initial_money end
+			fair_start: across players.sequence as o all o.position = board.squares.lower end
+			fair_money: across players.sequence as o all o.money = Initial_money end
 		end
 
 feature -- Basic operations
@@ -68,8 +68,8 @@ feature -- Basic operations
 			-- Start a game.
 		require
 			not_yet_playerd: winners.sequence.is_empty
-			fair_start: across players.sequence as o all o.item.position = board.squares.lower end
-			fair_money: across players.sequence as o all o.item.money = Initial_money end
+			fair_start: across players.sequence as o all o.position = board.squares.lower end
+			fair_money: across players.sequence as o all o.money = Initial_money end
 		local
 			round, i: INTEGER
 		do
@@ -79,11 +79,11 @@ feature -- Basic operations
 				print_board
 			invariant
 				inv_only("players_bounds", "owns_def", "players_nonvoid", "players_on_board", "no_observers")
-				across owns as o all o.item.is_wrapped end
+				across owns as o all o.is_wrapped end
 				players.inv_only ("lower_definition", "upper_definition")
 
-				across winners.sequence as o all players.sequence.has (o.item) end
-				across winners.sequence as o all o.item.is_wrapped end
+				across winners.sequence as o all players.sequence.has (o) end
+				across winners.sequence as o all o.is_wrapped end
 
 				modify (players.sequence, winners, die_1, die_2)
 				decreases ([])
@@ -95,13 +95,13 @@ feature -- Basic operations
 					i := 1
 				invariant
 					inv_only("players_bounds", "owns_def", "players_nonvoid", "players_on_board", "no_observers")
-					across owns as o all o.item.is_wrapped end
+					across owns as o all o.is_wrapped end
 					players.inv_only ("lower_definition", "upper_definition")
 
 					1 <= i and i <= players.sequence.count + 1
 
-					across winners.sequence as o all players.sequence.has (o.item) end
-					across winners.sequence as o all o.item.is_wrapped end
+					across winners.sequence as o all players.sequence.has (o) end
+					across winners.sequence as o all o.is_wrapped end
 
 					modify (players.sequence, winners, die_1, die_2)
 				until
@@ -120,7 +120,7 @@ feature -- Basic operations
 			end
 		ensure
 			has_winners: winners /= Void and then not winners.is_empty
-			winners_are_players: across winners.sequence as o all players.sequence.has (o.item) end
+			winners_are_players: across winners.sequence as o all players.sequence.has (o) end
 		end
 
 feature -- Constants
@@ -158,11 +158,10 @@ feature {NONE} -- Implementation
 		require
 			inv_only("players_bounds", "players_nonvoid")
 			players.is_wrapped
-			winners.is_wrapped and winners.observers = []
-			across players.sequence as o all o.item.is_wrapped end
+			winners.is_wrapped and winners.observers.is_empty
+			across players.sequence as o all o.is_wrapped end
 			winners.sequence.is_empty
 
-			modify (winners)
 		local
 			i, max: INTEGER
 		do
@@ -172,12 +171,12 @@ feature {NONE} -- Implementation
 				max := players[1].money
 				i := 2
 			invariant
-				winners.is_wrapped and winners.observers = []
+				winners.is_wrapped and winners.observers.is_empty
 				inv_only("players_bounds", "players_nonvoid")
 				players.inv_only ("lower_definition", "upper_definition")
 
 				not winners.sequence.is_empty
-				across winners.sequence as o all players.sequence.has (o.item) end
+				across winners.sequence as o all players.sequence.has (o) end
 
 				2 <= i and i <= players.sequence.count + 1
 			until
@@ -193,10 +192,11 @@ feature {NONE} -- Implementation
 				i := i + 1
 			end
 		ensure
+			modify (winners)
 			is_wrapped: winners.is_wrapped
 			has_winners: not winners.sequence.is_empty
-			winners_are_players: across winners.sequence as o all players.sequence.has (o.item) end
-			no_observers: winners.observers = []
+			winners_are_players: across winners.sequence as o all players.sequence.has (o) end
+			no_observers: winners.observers.is_empty
 		end
 
  	print_board
@@ -204,8 +204,7 @@ feature {NONE} -- Implementation
 		require
 			inv_only("players_bounds", "owns_def")
 			players.inv_only ("lower_definition", "upper_definition")
-			across owns as o all o.item.is_wrapped end
-			modify ([])
+			across owns as o all o.is_wrapped end
 		local
 			i, j: INTEGER
 		do
@@ -229,6 +228,8 @@ feature {NONE} -- Implementation
 				io.put_new_line
 				i := i + 1
 			end
+		ensure
+			modify ([])
 		end
 
 invariant
@@ -237,11 +238,11 @@ invariant
 	players_exist: players /= Void
 	winners_exist: winners /= Void
 	owns_players: owns.has (players)
-	owns_def: owns = {MML_SET [ANY]}[players.sequence.range] + [players, winners, board, die_1, die_2]
+	owns_def: owns = {MML_SET [ANY]}[players.sequence.range] & players & winners & board & die_1 & die_2
 	players_bounds: players.lower = 1 and Min_player_count <= players.sequence.count and players.sequence.count <= Max_player_count
-	players_on_board: across players.sequence as o all o.item.board = board end
+	players_on_board: across players.sequence as o all o.board = board end
 	players_nonvoid: players.sequence.non_void
 	players_distinct: players.sequence.no_duplicates
-	no_observers: winners.observers = []
+	no_observers: winners.observers.is_empty
 
 end

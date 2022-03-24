@@ -109,7 +109,7 @@ feature -- Specification
 		do
 			Result := across 1 |..| ns.count as i all
 				across 1 |..| ns.count as j all
-					i.item + 1 = j.item implies ns [i.item].next = ns [j.item] end end
+					i + 1 = j implies ns [i].next = ns [j] end end
 		end
 
 invariant
@@ -119,7 +119,7 @@ invariant
 	last_void: nodes.is_empty = (last = Void)
 	owns_definition: owns = nodes.range
 	nodes_exist: nodes.non_void
-	sequence_implementation: across 1 |..| nodes.count as i all sequence [i.item] = nodes [i.item].value end
+	sequence_implementation: across 1 |..| nodes.count as i all sequence [i] = nodes [i].value end
 	nodes_linked: is_linked (nodes)
 	nodes_first: nodes.count > 0 implies first = nodes.first
 	nodes_last: nodes.count > 0 implies last = nodes.last and then last.next = Void

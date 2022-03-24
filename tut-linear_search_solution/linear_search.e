@@ -25,7 +25,7 @@ feature -- Basic operations
 			present: a.sequence.has (value) = (Result > 0)
 			not_present: not a.sequence.has (value) = (Result = 0)
 			found_if_present: Result > 0 implies a.sequence[Result] = value
-			first_from_back: across (Result+1) |..| a.count as i all a.sequence[i.item] /= value end
+			first_from_back: across (Result+1) |..| a.count as i all a.sequence[i] /= value end
 		end
 
 feature -- Alternative encoding of loop invariant
@@ -37,7 +37,7 @@ feature -- Alternative encoding of loop invariant
 			from
 				Result := a.count
 			invariant
-				across (Result+1) |..| a.count as i all a.sequence[i.item] /= value end
+				across (Result+1) |..| a.count as i all a.sequence[i] /= value end
 			until
 				Result = 0 or else a[Result] = value
 			loop
@@ -49,7 +49,7 @@ feature -- Alternative encoding of loop invariant
 			present: a.sequence.has (value) = (Result > 0)
 			not_present: not a.sequence.has (value) = (Result = 0)
 			found_if_present: Result > 0 implies a.sequence[Result] = value
-			first_from_back: across (Result+1) |..| a.count as i all a.sequence[i.item] /= value end
+			first_from_back: across (Result+1) |..| a.count as i all a.sequence[i] /= value end
 		end
 
 end

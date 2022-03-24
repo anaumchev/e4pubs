@@ -45,10 +45,10 @@ feature -- Element change
 		require
 			limit_valid: limit >= (0).max(-balance)
 
-			modify_model ("credit_limit", Current)
 		do
 			credit_limit := limit
 		ensure
+			modify_model ("credit_limit", Current)
 			credit_limit_set: credit_limit = limit
 		end
 
@@ -57,10 +57,10 @@ feature -- Element change
 		require
 			amount_non_negative: amount >= 0
 
-			modify_model ("balance", Current)
 		do
 			balance := balance + amount
 		ensure
+			modify_model ("balance", Current)
 			balance_set: balance = old balance + amount
 		end
 
@@ -70,10 +70,10 @@ feature -- Element change
 			amount_not_negative: amount >= 0
 			amount_available: amount <= available_amount
 
-			modify_field (["balance", "closed"], Current)
 		do
 			balance := balance - amount
 		ensure
+			modify_field (["balance", "closed"], Current)
 			balance_set: balance = old balance - amount
 		end
 
@@ -86,11 +86,11 @@ feature -- Basic operations
 			amount_available: amount <= available_amount
 			no_aliasing: other /= Current
 
-			modify (Current, other)
 		do
 			balance := balance - amount
 			other.deposit (amount)
 		ensure
+			modify (Current, other)
 			withdrawal_made: balance = old balance - amount
 			despoit_made: other.balance = old other.balance + amount
 			same_credit_limit: credit_limit = old credit_limit

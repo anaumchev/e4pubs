@@ -27,11 +27,11 @@ feature -- Replacement
 		require
 			not_off: not off
 			target_wrapped: target.is_wrapped
-			target_observers_open: across target.observers as o all o.item /= Current implies o.item.is_open end
-			modify_model (["sequence", "box"], Current)
-			modify_model ("bag", target)
+			target_observers_open: across target.observers as o all o /= Current implies o.is_open end
 		deferred
 		ensure
+			modify_model (["sequence", "box"], Current)
+			modify_model ("bag", target)
 			sequence_effect: sequence ~ old sequence.replaced_at (index_, v)
 			target_wrapped: target.is_wrapped
 			target_bag_effect: target.bag ~ old ((target.bag / sequence [index_]) & v)

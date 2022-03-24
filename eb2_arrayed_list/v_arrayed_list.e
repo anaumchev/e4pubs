@@ -41,9 +41,7 @@ feature -- Initialization
 	copy_ (other: like Current)
 			-- Initialize by copying all the items of `other'.
 		require
-			observers_open: across observers as o all o.item.is_open end
-			modify_model ("sequence", Current)
-			modify_field ("closed", other)
+			observers_open: across observers as o all o.is_open end
 		do
 			if other /= Current then
 				other.unwrap
@@ -54,6 +52,8 @@ feature -- Initialization
 				sequence := other.sequence
 			end
 		ensure
+			modify_model ("sequence", Current)
+			modify_field ("closed", other)
 			sequence_effect: sequence ~ old other.sequence
 		end
 
@@ -97,7 +97,7 @@ feature -- Comparison
 					inv
 					other.inv
 					if Result
-						then across 1 |..| (i - 1) as k all sequence [k.item] = other.sequence [k.item] end
+						then across 1 |..| (i - 1) as k all sequence [k] = other.sequence [k] end
 						else sequence [i - 1] /= other.sequence [i - 1] end
 				until
 					i > count_ or not Result
@@ -210,7 +210,7 @@ feature -- Extension
 				input.is_wrapped
 				array.sequence.count = new_capacity
 				across 1 |..| sequence.count as k all
-					k.item <= i - 1 + j or i + ic <= k.item implies sequence [k.item] = array.sequence [array_seq_index (k.item)] end
+					k <= i - 1 + j or i + ic <= k implies sequence [k] = array.sequence [array_seq_index (k)] end
 				modify_model ("sequence", array)
 				modify_model ("index_", input)
 			until
@@ -333,7 +333,6 @@ feature {NONE} -- Implementation
 			src_non_negative: 1 <= src and src <= array.sequence.count - n + 1
 			dest_in_bounds: 1 <= dest and dest <= array.sequence.count - n + 1
 			inv_only ("array_non_empty", "first_index_in_bounds", "array_no_observers", "array_starts_from_zero")
-			modify_model ("sequence", array)
 		local
 			i: INTEGER
 		do
@@ -346,15 +345,15 @@ feature {NONE} -- Implementation
 					inv_only ("array_non_empty", "first_index_in_bounds", "array_no_observers", "array_starts_from_zero")
 					array.sequence.count = array.sequence.count.old_
 					across (array_index_set (dest + i, dest + n - 1)) as k all
-						array.sequence [k.item] = array.sequence.old_ [array_seq_index (list_index (k.item) - dest + src)] end
-					across 1 |..| array.sequence.count as k all not array_index_set (dest + i, dest + n - 1) [k.item] implies array.sequence [k.item] = array.sequence.old_ [k.item] end
+						array.sequence [k] = array.sequence.old_ [array_seq_index (list_index (k) - dest + src)] end
+					across 1 |..| array.sequence.count as k all not array_index_set (dest + i, dest + n - 1) [k] implies array.sequence [k] = array.sequence.old_ [k] end
 				until
 					i < 1
 				loop
 					array [array_index (dest + i - 1)] := array [array_index (src + i - 1)]
 					i := i - 1
 				end
-				check across (array_index_set (dest, dest + n - 1)) as k all array.sequence [k.item] = array.sequence.old_ [array_seq_index (list_index (k.item) - dest + src)] end end
+				check across (array_index_set (dest, dest + n - 1)) as k all array.sequence [k] = array.sequence.old_ [array_seq_index (list_index (k) - dest + src)] end end
 			elseif src > dest then
 				from
 					i := 1
@@ -364,25 +363,26 @@ feature {NONE} -- Implementation
 					inv_only ("array_non_empty", "first_index_in_bounds", "array_no_observers", "array_starts_from_zero")
 					array.sequence.count = array.sequence.count.old_
 					across (array_index_set (dest, dest + i - 2)) as k all
-						array.sequence [k.item] = array.sequence.old_ [array_seq_index (list_index (k.item) - dest + src)] end
-					across 1 |..| array.sequence.count as k all not array_index_set (dest, dest + i - 2) [k.item] implies array.sequence [k.item] = array.sequence.old_ [k.item] end
+						array.sequence [k] = array.sequence.old_ [array_seq_index (list_index (k) - dest + src)] end
+					across 1 |..| array.sequence.count as k all not array_index_set (dest, dest + i - 2) [k] implies array.sequence [k] = array.sequence.old_ [k] end
 				until
 					i > n
 				loop
 					array [array_index (dest + i - 1)] := array [array_index (src + i - 1)]
 					i := i + 1
 				end
-				check across (array_index_set (dest, dest + n - 1)) as k all array.sequence [k.item] = array.sequence.old_ [array_seq_index (list_index (k.item) - dest + src)] end end
+				check across (array_index_set (dest, dest + n - 1)) as k all array.sequence [k] = array.sequence.old_ [array_seq_index (list_index (k) - dest + src)] end end
 			end
 		ensure
+			modify_model ("sequence", array)
 			array_wrapped: array.is_wrapped
 			inv_only ("array_non_empty", "first_index_in_bounds", "array_no_observers", "array_starts_from_zero")
 			sequence_domain_effect: array.sequence.count = old array.sequence.count
 			sequence_effect_new: across (array_index_set (dest, dest + n - 1)) as k all
 					across 1 |..| array.sequence.count as l all
-						l.item = array_seq_index (list_index (k.item) - dest + src) implies array.sequence [k.item] = (old array.sequence) [l.item]
+						l = array_seq_index (list_index (k) - dest + src) implies array.sequence [k] = (old array.sequence) [l]
 					end end
-			sequence_effect_old: across 1 |..| array.sequence.count as k all not array_index_set (dest, dest + n - 1) [k.item] implies array.sequence [k.item] = array.sequence.old_ [k.item] end
+			sequence_effect_old: across 1 |..| array.sequence.count as k all not array_index_set (dest, dest + n - 1) [k] implies array.sequence [k] = array.sequence.old_ [k] end
 		end
 
 	reserve (n: INTEGER)
@@ -392,8 +392,7 @@ feature {NONE} -- Implementation
 			explicit: contracts
 		require
 			wrapped: is_wrapped
-			observers_open: across observers as o all o.item.is_open end
-			modify_field (["first_index", "closed"], Current)
+			observers_open: across observers as o all o.is_open end
 		local
 			old_size, new_size: INTEGER
 		do
@@ -410,6 +409,7 @@ feature {NONE} -- Implementation
 			end
 			wrap
 		ensure
+			modify_field (["first_index", "closed"], Current)
 			at_least_n: array.sequence.count >= n
 			at_least_old: array.sequence.count >= old array.sequence.count
 			wrapped: is_wrapped
@@ -469,12 +469,12 @@ feature {NONE} -- Specification
 
 invariant
 	array_exists: array /= Void
-	owns_definition: owns = [ array ]
+	owns_definition: owns = create {MML_SET [ANY]} & array
 	array_non_empty: array.sequence.count > 0
 	array_starts_from_zero: array.lower_ = 0
 	first_index_in_bounds: 0 <= first_index and first_index < array.sequence.count
 	sequence_count_constraint: sequence.count <= array.sequence.count
-	sequence_implementation: across 1 |..| sequence.count as i all sequence [i.item] = array.sequence [array_seq_index (i.item)] end
+	sequence_implementation: across 1 |..| sequence.count as i all sequence [i] = array.sequence [array_seq_index (i)] end
 	array_no_observers: array.observers.is_empty
 
 note

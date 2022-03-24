@@ -13,10 +13,10 @@ feature {NONE} -- Initialization
 	make
 			-- Create a new account with balance of 0.
 		note
-			status: creator  -- Only verify `make' as constructor.
+			status: creator -- Only verify `make' as constructor.
 		do
 			balance := 0
-			create transactions.make  -- Empty list of transactions.
+			create transactions.make -- Empty list of transactions.
 		ensure
 			balance_zero: balance = 0
 		end
@@ -62,7 +62,7 @@ feature -- Operations
 		end
 
 
-feature  -- Breaking encapsulation
+feature -- Breaking encapsulation
 
 	leak_transactions: SIMPLE_LIST [INTEGER]
 			-- Reference to internal list of transactions
@@ -80,15 +80,15 @@ feature  -- Breaking encapsulation
 			-- leaves `Current' unwrapped.
 		note
 			explicit: "all"	-- forgo default annotations
-			status: impure  -- ignore command/query separation
+			status: impure -- ignore command/query separation
 		require
 			is_wrapped		-- start from consistent `Current',
 							-- otherwise cannot guarantee anything about `transactions'
-			modify_field ("closed", Current)
 		do
 			Result := transactions
 			unwrap			-- open `Current'
 		ensure
+			modify_field ("closed", Current)
 			consistency_broken: is_open
 			result_transactions: Result = transactions
 				-- Can prove that the result is consistent
@@ -111,9 +111,9 @@ feature {NONE} -- Implementation
 
 	transactions: SIMPLE_LIST [INTEGER]
 		-- History of transactions:
-		--           positive integer = deposited amount
-		--           negative integer = withdrawn amount
-		--           latest transactions in back of list
+		--      positive integer = deposited amount
+		--      negative integer = withdrawn amount
+		--      latest transactions in back of list
 
 
 feature -- Specification
@@ -133,7 +133,7 @@ invariant
 	balance_non_negative: balance >= 0
 
 	transactions /= Void
-	owns = [ transactions ]  -- The account controls access to list of transactions.
+	owns = create {MML_SET [ANY]} & transactions -- The account controls access to list of transactions.
 	balance = sum (transactions.sequence)
 
 end

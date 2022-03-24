@@ -82,7 +82,7 @@ feature -- Operations
 invariant
 	value_non_negative: value >= 0
 	cell_non_void: cell /= Void
-	owns_definition: owns = [cell] -- describing the ownership structure
+	owns_definition: owns = create {MML_SET [ANY]} & cell -- describing the ownership structure
 	value_definition: value = cell.item -- made admissible by the previous clause
 
 --note
