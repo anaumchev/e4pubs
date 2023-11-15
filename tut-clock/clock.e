@@ -15,7 +15,7 @@ feature {NONE} -- Initialization
 		note
 			status: creator
 		require
-			-- TASK 3: Add precondition.
+			-- TASK 3: Add precondition for this routine.
 		do
 			hours := a_hours
 			minutes := a_minutes
